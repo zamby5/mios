@@ -1,0 +1,2520 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Murat İyicioğlu Gayrimenkul · Panel</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230A1120'/%3E%3Crect x='4' y='4' width='56' height='56' rx='11' fill='%23FBBF24'/%3E%3Ctext x='32' y='42' font-family='Arial, sans-serif' font-size='26' font-weight='700' fill='%230A1120' text-anchor='middle'%3EMİ%3C/text%3E%3C/svg%3E" />
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230A1120'/%3E%3Crect x='4' y='4' width='56' height='56' rx='11' fill='%23FBBF24'/%3E%3Ctext x='32' y='42' font-family='Arial, sans-serif' font-size='26' font-weight='700' fill='%230A1120' text-anchor='middle'%3EMİ%3C/text%3E%3C/svg%3E" />
+<meta name="theme-color" content="#0A1120" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin></script>
+<style>
+  :root{
+    --bg:#0A1120; --panel:#101a30; --panel2:#0D1526; --border:#1c2843; --border2:#233151;
+    --text:#e7ecf5; --muted:#94a3b8; --muted2:#64748b;
+    --amber:#fbbf24; --amber-soft:rgba(251,191,36,.1); --amber-bd:rgba(251,191,36,.3);
+    --emerald:#34d399; --emerald-soft:rgba(52,211,153,.1); --emerald-bd:rgba(52,211,153,.3);
+    --rose:#fb7185; --rose-soft:rgba(251,113,133,.1); --rose-bd:rgba(251,113,133,.3);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;}
+  #root{min-height:100vh;}
+  ::-webkit-scrollbar{width:8px;height:8px;}
+  ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:8px;}
+  button{font-family:inherit;cursor:pointer;}
+  input,select{font-family:inherit;}
+  a{color:inherit;}
+
+  /* Splash */
+  .splash{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:999;transition:opacity .4s ease;}
+  .splash.fade{opacity:0;pointer-events:none;}
+  .splash-icon{width:64px;height:64px;border-radius:16px;background:var(--amber);display:flex;align-items:center;justify-content:center;color:var(--bg);font-weight:800;font-size:22px;box-shadow:0 0 0 1px var(--border), 0 20px 50px rgba(251,191,36,.15);animation:pulse 1.6s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.06);}}
+  .splash-name{font-size:14px;color:var(--muted);letter-spacing:.04em;}
+  .spinner{width:22px;height:22px;border-radius:50%;border:2.5px solid var(--border2);border-top-color:var(--amber);animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* Layout */
+  .app{min-height:100vh;display:flex;}
+  .sidebar{width:256px;flex-shrink:0;background:#0C1424;border-right:1px solid var(--border);padding:16px;display:flex;flex-direction:column;}
+  .brand{display:flex;align-items:center;gap:10px;padding:10px 8px 14px;}
+  .brand-icon{width:36px;height:36px;border-radius:10px;background:var(--amber);display:flex;align-items:center;justify-content:center;color:var(--bg);font-weight:800;font-size:13px;flex-shrink:0;}
+  .brand-name{font-size:14px;font-weight:700;color:#fcd34d;line-height:1.2;}
+  .brand-sub{font-size:10px;color:var(--muted2);margin-top:2px;}
+  .nav{flex:1;overflow-y:auto;}
+  .nav-group{margin-bottom:18px;}
+  .nav-title{font-size:10px;letter-spacing:.08em;color:#475569;padding:0 10px;margin-bottom:6px;}
+  .nav-item{width:100%;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;font-size:13px;color:var(--muted);background:transparent;border:1px solid transparent;text-align:left;}
+  .nav-item:hover{color:#e2e8f0;background:#121c33;}
+  .nav-item.active{color:#fcd34d;background:var(--amber-soft);border-color:var(--amber-bd);}
+  .sidebar-footer{font-size:10px;color:#475569;padding:10px 8px 0;border-top:1px solid var(--border);margin-top:10px;display:flex;justify-content:space-between;}
+  .main{flex:1;padding:24px;overflow-y:auto;max-height:100vh;}
+  @media (max-width:820px){.sidebar{position:fixed;left:-260px;transition:left .2s;height:100vh;z-index:50;}.sidebar.open{left:0;}.menu-btn{display:inline-flex !important;}}
+  .menu-btn{display:none;}
+
+  /* Generic */
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:18px;}
+  .h1{font-size:22px;font-weight:600;color:#f1f5f9;margin:0;}
+  .eyebrow{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#fcd34d;opacity:.85;margin-bottom:4px;}
+  .row{display:flex;align-items:center;}
+  .between{justify-content:space-between;}
+  .gap-2{gap:8px;} .gap-3{gap:12px;} .wrap{flex-wrap:wrap;}
+  .grid{display:grid;gap:14px;}
+  .grid-2{grid-template-columns:repeat(2,1fr);} .grid-3{grid-template-columns:repeat(3,1fr);} .grid-4{grid-template-columns:repeat(4,1fr);}
+  @media (max-width:820px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr 1fr;}}
+  @media (max-width:520px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr;}}
+
+  .btn{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:9px 15px;border-radius:10px;border:1px solid transparent;background:var(--amber);color:var(--bg);}
+  .btn:hover{filter:brightness(1.08);}
+  .btn:disabled{opacity:.5;cursor:not-allowed;}
+  .btn-ghost{background:var(--panel);border:1px solid var(--border);color:#cbd5e1;font-weight:500;}
+  .btn-ghost:hover{border-color:var(--amber-bd);color:#fcd34d;}
+  .btn-icon{background:transparent;border:none;color:#64748b;padding:4px;border-radius:6px;}
+  .btn-icon:hover{color:#fb7185;}
+
+  .input,.select{width:100%;background:var(--panel2);border:1px solid var(--border2);border-radius:10px;padding:9px 12px;font-size:13px;color:var(--text);outline:none;}
+  .input::placeholder{color:#475569;}
+  .input:focus,.select:focus{border-color:rgba(251,191,36,.5);}
+  .label{font-size:11px;color:var(--muted2);display:block;margin-bottom:4px;}
+
+  .badge{font-size:11px;padding:3px 10px;border-radius:999px;border:1px solid var(--border2);color:var(--muted);}
+  .badge-ok{background:var(--emerald-soft);border-color:var(--emerald-bd);color:#6ee7b7;}
+  .badge-warn{background:var(--rose-soft);border-color:var(--rose-bd);color:#fda4af;}
+  .badge-dot{width:6px;height:6px;border-radius:50%;background:var(--emerald);display:inline-block;margin-right:5px;}
+
+  .alert{cursor:pointer;background:var(--rose-soft);border:1px solid var(--rose-bd);border-radius:16px;padding:14px 18px;display:flex;align-items:center;gap:10px;margin-bottom:18px;}
+  .alert-text{font-size:13px;color:#ffe4e6;}
+
+  .stat{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:16px;flex:1;min-width:150px;}
+  .stat-label{font-size:11px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px;}
+  .stat-value{font-size:22px;font-weight:600;color:#f1f5f9;}
+  .stat-sub{font-size:11px;color:var(--muted2);margin-top:4px;}
+
+  .rate-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 14px;flex:1;min-width:130px;}
+  .rate-label{font-size:11px;color:var(--muted2);margin-bottom:2px;}
+  .rate-value{font-size:17px;font-weight:600;color:#f1f5f9;}
+  .rate-change{font-size:11px;margin-top:2px;}
+  .up{color:#34d399;} .down{color:#fb7185;}
+  .blurred{filter:blur(4px);user-select:none;}
+
+  .list-row{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:8px;}
+  .list-row:hover{border-color:#2c3d63;}
+  .list-empty{color:var(--muted2);font-size:13px;padding:32px;text-align:center;border:1px dashed var(--border2);border-radius:12px;}
+
+  .toggle-pill{font-size:11px;padding:4px 10px;border-radius:999px;border:1px solid var(--border2);color:var(--muted);background:transparent;}
+  .toggle-pill.on{border-color:var(--emerald-bd);color:#6ee7b7;background:var(--emerald-soft);}
+
+  .bar-track{height:10px;background:var(--panel2);border-radius:999px;overflow:hidden;}
+  .bar-fill{height:100%;background:var(--amber);}
+
+  .section-head{display:flex;align-items:center;gap:10px;margin-bottom:18px;}
+  .section-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;}
+  .section-title{font-size:17px;font-weight:600;color:#f1f5f9;}
+  .count-pill{font-size:11px;color:var(--muted2);background:var(--panel);border:1px solid var(--border);padding:2px 9px;border-radius:999px;}
+
+  .edit-panel{background:var(--panel2);border:1px solid var(--amber-bd);border-radius:14px;padding:14px;margin-bottom:14px;}
+  .health-row{display:flex;align-items:center;justify-content:space-between;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:8px;}
+  .health-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+
+  .chat-box{background:var(--panel);border:1px solid var(--border);border-radius:16px;display:flex;flex-direction:column;height:60vh;overflow:hidden;}
+  .chat-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;}
+  .msg{max-width:80%;border-radius:12px;padding:9px 13px;font-size:13px;line-height:1.5;}
+  .msg.user{align-self:flex-end;background:var(--amber-soft);border:1px solid var(--amber-bd);color:#fde68a;}
+  .msg.bot{align-self:flex-start;background:var(--panel2);border:1px solid var(--border2);color:#e2e8f0;}
+  .disclaimer{font-size:11px;color:var(--muted2);padding:8px 14px;border-bottom:1px solid var(--border);background:rgba(251,191,36,.04);}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>const {
+  useState,
+  useEffect,
+  useMemo,
+  useRef
+} = React;
+
+/* ---------------- Storage adapter (Claude bulut depolama + tarayıcı yedeği) ----------------
+   window.storage yalnızca Claude.ai artifact ortamında sağlanır. Dosya indirilip bağımsız
+   açıldığında veya başka bir yerde barındırıldığında bu API mevcut olmayabilir; bu durumda
+   otomatik olarak tarayıcının localStorage'ına düşer ki veri/anahtar kaybı yaşanmasın. */
+const LS_PREFIX = "mig_";
+const LocalStorageAdapter = {
+  async get(key) {
+    const raw = window.localStorage.getItem(LS_PREFIX + key);
+    if (raw === null) throw new Error("not found");
+    return {
+      key,
+      value: raw,
+      shared: false
+    };
+  },
+  async set(key, value) {
+    window.localStorage.setItem(LS_PREFIX + key, value);
+    return {
+      key,
+      value,
+      shared: false
+    };
+  },
+  async delete(key) {
+    window.localStorage.removeItem(LS_PREFIX + key);
+    return {
+      key,
+      deleted: true,
+      shared: false
+    };
+  },
+  async list(prefix) {
+    const keys = Object.keys(window.localStorage).filter(k => k.startsWith(LS_PREFIX + (prefix || ""))).map(k => k.slice(LS_PREFIX.length));
+    return {
+      keys,
+      prefix,
+      shared: false
+    };
+  }
+};
+const hasCloudStorage = typeof window !== "undefined" && window.storage && typeof window.storage.get === "function";
+let hasLocalStorage = false;
+try {
+  window.localStorage.setItem("__mig_test__", "1");
+  window.localStorage.removeItem("__mig_test__");
+  hasLocalStorage = true;
+} catch (e) {
+  hasLocalStorage = false;
+}
+const AppStorage = hasCloudStorage ? window.storage : LocalStorageAdapter;
+const STORAGE_BACKEND = hasCloudStorage ? "cloud" : hasLocalStorage ? "local" : "none";
+
+/* ---------------- Icons (bespoke, dependency-free) ---------------- */
+function Icon({
+  name,
+  size = 16,
+  className = "",
+  style
+}) {
+  const p = {
+    width: size,
+    height: size,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.8,
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    className,
+    style
+  };
+  const paths = {
+    dashboard: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("rect", {
+      x: "3",
+      y: "3",
+      width: "7",
+      height: "9",
+      rx: "1.5"
+    }), /*#__PURE__*/React.createElement("rect", {
+      x: "14",
+      y: "3",
+      width: "7",
+      height: "5",
+      rx: "1.5"
+    }), /*#__PURE__*/React.createElement("rect", {
+      x: "14",
+      y: "12",
+      width: "7",
+      height: "9",
+      rx: "1.5"
+    }), /*#__PURE__*/React.createElement("rect", {
+      x: "3",
+      y: "16",
+      width: "7",
+      height: "5",
+      rx: "1.5"
+    })),
+    tasks: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
+      d: "M4 6h16M4 12h16M4 18h10"
+    }), /*#__PURE__*/React.createElement("circle", {
+      cx: "20",
+      cy: "18",
+      r: "1.6"
+    })),
+    calendar: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("rect", {
+      x: "3",
+      y: "5",
+      width: "18",
+      height: "16",
+      rx: "2"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M3 10h18M8 3v4M16 3v4"
+    })),
+    trending: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
+      d: "M3 17l6-6 4 4 8-8"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M15 7h6v6"
+    })),
+    wallet: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("rect", {
+      x: "3",
+      y: "6",
+      width: "18",
+      height: "13",
+      rx: "2"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M3 10h18"
+    }), /*#__PURE__*/React.createElement("circle", {
+      cx: "17",
+      cy: "14",
+      r: "1.3"
+    })),
+    piggy: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
+      d: "M4 12a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v2a2 2 0 0 1-2 2h-1l-1 3H9l-1-3H7a3 3 0 0 1-3-3z"
+    }), /*#__PURE__*/React.createElement("circle", {
+      cx: "15",
+      cy: "11",
+      r: ".8"
+    })),
+    building: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("rect", {
+      x: "4",
+      y: "3",
+      width: "10",
+      height: "18",
+      rx: "1"
+    }), /*#__PURE__*/React.createElement("rect", {
+      x: "16",
+      y: "9",
+      width: "5",
+      height: "12",
+      rx: "1"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M7 7h1M11 7h1M7 11h1M11 11h1M7 15h1M11 15h1"
+    })),
+    database: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("ellipse", {
+      cx: "12",
+      cy: "5",
+      rx: "8",
+      ry: "3"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"
+    })),
+    chart: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
+      d: "M4 20V10M11 20V4M18 20v-7"
+    })),
+    users: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("circle", {
+      cx: "9",
+      cy: "8",
+      r: "3.2"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"
+    }), /*#__PURE__*/React.createElement("circle", {
+      cx: "18",
+      cy: "9",
+      r: "2.6"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M15.5 14.3c2.6.5 4.5 2.6 4.5 5.7"
+    })),
+    folder: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
+      d: "M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
+    })),
+    calc: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("rect", {
+      x: "4",
+      y: "2",
+      width: "16",
+      height: "20",
+      rx: "2"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M8 7h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 19h.01M12 19h.01M16 19h.01"
+    })),
+    bot: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("rect", {
+      x: "4",
+      y: "8",
+      width: "16",
+      height: "12",
+      rx: "2"
+    }), /*#__PURE__*/React.createElement("circle", {
+      cx: "9",
+      cy: "14",
+      r: "1.2"
+    }), /*#__PURE__*/React.createElement("circle", {
+      cx: "15",
+      cy: "14",
+      r: "1.2"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M12 8V4M9 4h6"
+    })),
+    plus: /*#__PURE__*/React.createElement("path", {
+      d: "M12 5v14M5 12h14"
+    }),
+    trash: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
+      d: "M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"
+    })),
+    x: /*#__PURE__*/React.createElement("path", {
+      d: "M18 6 6 18M6 6l12 12"
+    }),
+    chevron: /*#__PURE__*/React.createElement("path", {
+      d: "M9 6l6 6-6 6"
+    }),
+    search: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("circle", {
+      cx: "11",
+      cy: "11",
+      r: "7"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M20 20l-3.5-3.5"
+    })),
+    alert: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
+      d: "M12 3l10 18H2z"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M12 10v4M12 17h.01"
+    })),
+    eye: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
+      d: "M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"
+    }), /*#__PURE__*/React.createElement("circle", {
+      cx: "12",
+      cy: "12",
+      r: "3"
+    })),
+    eyeOff: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
+      d: "M3 3l18 18"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M10.6 5.2A10.6 10.6 0 0 1 12 5c6.5 0 10 7 10 7a15.6 15.6 0 0 1-3.4 4.3M6.3 6.4C3.7 8 2 12 2 12s3.5 7 10 7c1.3 0 2.5-.2 3.6-.6"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M9.9 9.9a3 3 0 0 0 4.2 4.2"
+    })),
+    pencil: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
+      d: "M12 20h9"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"
+    })),
+    save: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
+      d: "M5 3h11l3 3v15H5z"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M8 3v6h8V3M8 21v-7h8v7"
+    })),
+    dollar: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
+      d: "M12 2v20"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M17 6.5c0-1.9-2.2-3.5-5-3.5S7 4.6 7 6.5 9.2 9.5 12 9.5s5 1.5 5 3.5-2.2 3.5-5 3.5-5-1.6-5-3.5"
+    })),
+    coins: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("ellipse", {
+      cx: "9",
+      cy: "8",
+      rx: "6",
+      ry: "3.2"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M3 8v4c0 1.8 2.7 3.2 6 3.2s6-1.4 6-3.2V8"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M3 12v4c0 1.8 2.7 3.2 6 3.2 1 0 2-.1 2.8-.4"
+    }), /*#__PURE__*/React.createElement("ellipse", {
+      cx: "17",
+      cy: "13.5",
+      rx: "4.2",
+      ry: "2.3"
+    })),
+    megaphone: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
+      d: "M3 10v4h3l6 4V6l-6 4z"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M14 9a3 3 0 0 1 0 6"
+    })),
+    refresh: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
+      d: "M4 4v5h5"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M20 20v-5h-5"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M4 9a8 8 0 0 1 14.5-3.5M20 15a8 8 0 0 1-14.5 3.5"
+    })),
+    send: /*#__PURE__*/React.createElement("path", {
+      d: "M22 2 11 13M22 2l-7 20-4-9-9-4z"
+    }),
+    key: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("circle", {
+      cx: "7.5",
+      cy: "15.5",
+      r: "4.5"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M10.6 12.4 20 3M17 6l3 3M14 9l2.5 2.5"
+    })),
+    loader: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
+      d: "M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"
+    })),
+    pulse: /*#__PURE__*/React.createElement("path", {
+      d: "M3 12h4l2-7 4 14 2-7h6"
+    }),
+    menu: /*#__PURE__*/React.createElement("path", {
+      d: "M4 6h16M4 12h16M4 18h16"
+    }),
+    check: /*#__PURE__*/React.createElement("path", {
+      d: "M20 6 9 17l-5-5"
+    })
+  };
+  return /*#__PURE__*/React.createElement("svg", p, paths[name] || null);
+}
+
+/* ---------------- Config ---------------- */
+const APP_NAME = "Murat İyicioğlu";
+const APP_SUB = "Gayrimenkul";
+const STORAGE_KEY = "muratIyiciogluGayrimenkulData";
+const EMPTY = {
+  tasks: [],
+  appointments: [],
+  income: [],
+  expenses: [],
+  bankAssets: [],
+  portfolio: [],
+  siteData: [],
+  contacts: [],
+  documents: [],
+  rates: {
+    usd: 47.6,
+    usdChange: 0.09,
+    eur: 55.05,
+    eurChange: 0.05,
+    goldOns: 4268.17,
+    goldOnsChange: 0.5,
+    goldGram: 6532.31,
+    goldGramChange: 0.5,
+    ataAltin: 44097,
+    ataAltinChange: 0.03,
+    updatedAt: ""
+  },
+  marketStats: {
+    region: "Bölgem",
+    forSaleCount: 0,
+    forRentCount: 0,
+    avgSalePrice: 0,
+    avgOtherPrice: 0
+  },
+  socialPlan: {
+    activeAccounts: 3,
+    totalContent: 5,
+    doneContent: 0
+  }
+};
+const money = n => new Intl.NumberFormat("tr-TR", {
+  style: "currency",
+  currency: "TRY",
+  maximumFractionDigits: 0
+}).format(Number(n) || 0);
+const todayISO = () => new Date().toISOString().slice(0, 10);
+const uid = () => Math.random().toString(36).slice(2, 10);
+async function fetchLiveRates(prevRates) {
+  const [usdRes, eurRes, goldRes] = await Promise.all([fetch("https://api.frankfurter.dev/v1/latest?from=USD&to=TRY").then(r => r.json()), fetch("https://api.frankfurter.dev/v1/latest?from=EUR&to=TRY").then(r => r.json()), fetch("https://api.gold-api.com/price/XAU").then(r => r.json())]);
+  const usd = usdRes.rates.TRY;
+  const eur = eurRes.rates.TRY;
+  const goldOns = goldRes.price;
+  const goldGram = goldOns / 31.1035 * usd;
+  const ataAltin = goldGram * 7.216;
+  const pct = (n, o) => o ? Number(((n - o) / o * 100).toFixed(2)) : 0;
+  return {
+    usd,
+    usdChange: pct(usd, prevRates.usd),
+    eur,
+    eurChange: pct(eur, prevRates.eur),
+    goldOns,
+    goldOnsChange: pct(goldOns, prevRates.goldOns),
+    goldGram,
+    goldGramChange: pct(goldGram, prevRates.goldGram),
+    ataAltin,
+    ataAltinChange: pct(ataAltin, prevRates.ataAltin),
+    updatedAt: new Date().toISOString()
+  };
+}
+
+/* ---------------- Section field configs ---------------- */
+const SECTIONS = {
+  tasks: {
+    label: "Görevler",
+    icon: "tasks",
+    accent: "gold",
+    fields: [{
+      key: "title",
+      label: "Görev",
+      type: "text",
+      required: true
+    }, {
+      key: "dueDate",
+      label: "Son Tarih",
+      type: "date"
+    }, {
+      key: "priority",
+      label: "Öncelik",
+      type: "select",
+      options: ["Düşük", "Orta", "Yüksek"]
+    }],
+    toggle: {
+      key: "completed",
+      onLabel: "Tamamlandı",
+      offLabel: "Bekliyor"
+    }
+  },
+  appointments: {
+    label: "Randevular",
+    icon: "calendar",
+    accent: "teal",
+    fields: [{
+      key: "title",
+      label: "Başlık",
+      type: "text",
+      required: true
+    }, {
+      key: "date",
+      label: "Tarih",
+      type: "date",
+      required: true
+    }, {
+      key: "time",
+      label: "Saat",
+      type: "time"
+    }, {
+      key: "location",
+      label: "Yer",
+      type: "text"
+    }]
+  },
+  income: {
+    label: "Gelir Yönetimi",
+    icon: "trending",
+    accent: "teal",
+    fields: [{
+      key: "description",
+      label: "Açıklama",
+      type: "text",
+      required: true
+    }, {
+      key: "amount",
+      label: "Tutar (₺)",
+      type: "number",
+      required: true
+    }, {
+      key: "date",
+      label: "Tarih",
+      type: "date"
+    }, {
+      key: "category",
+      label: "Kategori",
+      type: "select",
+      options: ["Kira", "Satış", "Danışmanlık", "Diğer"]
+    }]
+  },
+  expenses: {
+    label: "Gider & Ödemeler",
+    icon: "wallet",
+    accent: "rose",
+    fields: [{
+      key: "description",
+      label: "Açıklama",
+      type: "text",
+      required: true
+    }, {
+      key: "amount",
+      label: "Tutar (₺)",
+      type: "number",
+      required: true
+    }, {
+      key: "dueDate",
+      label: "Vade Tarihi",
+      type: "date"
+    }, {
+      key: "category",
+      label: "Kategori",
+      type: "select",
+      options: ["Kart", "Fatura", "Kira", "Diğer"]
+    }],
+    toggle: {
+      key: "paid",
+      onLabel: "Ödendi",
+      offLabel: "Bekliyor"
+    }
+  },
+  bankAssets: {
+    label: "Banka & Varlıklar",
+    icon: "piggy",
+    accent: "gold",
+    fields: [{
+      key: "name",
+      label: "Ad",
+      type: "text",
+      required: true
+    }, {
+      key: "type",
+      label: "Tür",
+      type: "select",
+      options: ["Banka Hesabı", "Nakit", "Döviz", "Altın", "Diğer"]
+    }, {
+      key: "balance",
+      label: "Bakiye (₺)",
+      type: "number",
+      required: true
+    }]
+  },
+  portfolio: {
+    label: "Portföy & Potansiyel",
+    icon: "building",
+    accent: "gold",
+    fields: [{
+      key: "title",
+      label: "İlan Başlığı",
+      type: "text",
+      required: true
+    }, {
+      key: "type",
+      label: "Tür",
+      type: "select",
+      options: ["Satılık", "Kiralık"]
+    }, {
+      key: "price",
+      label: "Fiyat (₺)",
+      type: "number"
+    }, {
+      key: "status",
+      label: "Durum",
+      type: "select",
+      options: ["Aktif", "Beklemede", "Satıldı"]
+    }, {
+      key: "location",
+      label: "Konum",
+      type: "text"
+    }]
+  },
+  siteData: {
+    label: "Site Dataları",
+    icon: "database",
+    accent: "teal",
+    fields: [{
+      key: "siteName",
+      label: "Site Adı",
+      type: "text",
+      required: true
+    }, {
+      key: "unitCount",
+      label: "Konut Adedi",
+      type: "number"
+    }, {
+      key: "avgPrice",
+      label: "Ortalama Fiyat (₺)",
+      type: "number"
+    }, {
+      key: "region",
+      label: "Bölge",
+      type: "text"
+    }]
+  },
+  contacts: {
+    label: "Müşteri & Danışman",
+    icon: "users",
+    accent: "rose",
+    fields: [{
+      key: "name",
+      label: "Ad Soyad",
+      type: "text",
+      required: true
+    }, {
+      key: "role",
+      label: "Tür",
+      type: "select",
+      options: ["Müşteri", "Danışman", "Tedarikçi", "Diğer"]
+    }, {
+      key: "phone",
+      label: "Telefon",
+      type: "text"
+    }, {
+      key: "notes",
+      label: "Not",
+      type: "text"
+    }]
+  },
+  documents: {
+    label: "Ofis & Evrak",
+    icon: "folder",
+    accent: "gold",
+    fields: [{
+      key: "title",
+      label: "Belge Adı",
+      type: "text",
+      required: true
+    }, {
+      key: "category",
+      label: "Kategori",
+      type: "select",
+      options: ["Sözleşme", "Fatura", "Evrak", "Diğer"]
+    }, {
+      key: "date",
+      label: "Tarih",
+      type: "date"
+    }, {
+      key: "note",
+      label: "Not",
+      type: "text"
+    }]
+  }
+};
+const NAV_GROUPS = [{
+  title: "GENEL",
+  items: [{
+    key: "dashboard",
+    label: "Panel",
+    icon: "dashboard"
+  }, {
+    key: "tasks",
+    label: "Görevler",
+    icon: "tasks"
+  }, {
+    key: "appointments",
+    label: "Randevular",
+    icon: "calendar"
+  }]
+}, {
+  title: "FİNANS",
+  items: [{
+    key: "income",
+    label: "Gelir Yönetimi",
+    icon: "trending"
+  }, {
+    key: "expenses",
+    label: "Gider & Ödemeler",
+    icon: "wallet"
+  }, {
+    key: "bankAssets",
+    label: "Banka & Varlıklar",
+    icon: "piggy"
+  }]
+}, {
+  title: "PORTFÖY & PAZAR",
+  items: [{
+    key: "portfolio",
+    label: "Portföy & Potansiyel",
+    icon: "building"
+  }, {
+    key: "siteData",
+    label: "Site Dataları",
+    icon: "database"
+  }, {
+    key: "analytics",
+    label: "Analiz & Araçlar",
+    icon: "chart"
+  }]
+}, {
+  title: "MÜŞTERİ & EKİP",
+  items: [{
+    key: "contacts",
+    label: "Müşteri & Danışman",
+    icon: "users"
+  }, {
+    key: "documents",
+    label: "Ofis & Evrak",
+    icon: "folder"
+  }]
+}, {
+  title: "ARAÇLAR",
+  items: [{
+    key: "calc",
+    label: "Hesaplama Araçları",
+    icon: "calc"
+  }, {
+    key: "ai",
+    label: "AI Asistan",
+    icon: "bot"
+  }, {
+    key: "health",
+    label: "Sistem Sağlığı",
+    icon: "pulse"
+  }]
+}];
+const ACCENT = {
+  gold: {
+    color: "#fcd34d",
+    bg: "var(--amber-soft)",
+    bd: "var(--amber-bd)"
+  },
+  teal: {
+    color: "#6ee7b7",
+    bg: "var(--emerald-soft)",
+    bd: "var(--emerald-bd)"
+  },
+  rose: {
+    color: "#fda4af",
+    bg: "var(--rose-soft)",
+    bd: "var(--rose-bd)"
+  }
+};
+function SectionHeader({
+  icon,
+  title,
+  accent,
+  count
+}) {
+  const a = ACCENT[accent];
+  return /*#__PURE__*/React.createElement("div", {
+    className: "section-head"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "section-icon",
+    style: {
+      background: a.bg,
+      border: `1px solid ${a.bd}`,
+      color: a.color
+    }
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: icon,
+    size: 16
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "section-title"
+  }, title), typeof count === "number" && /*#__PURE__*/React.createElement("span", {
+    className: "count-pill"
+  }, count, " kayıt"));
+}
+function Field({
+  f,
+  value,
+  onChange
+}) {
+  if (f.type === "select") {
+    return /*#__PURE__*/React.createElement("select", {
+      className: "select",
+      value: value || "",
+      onChange: e => onChange(e.target.value)
+    }, /*#__PURE__*/React.createElement("option", {
+      value: ""
+    }, "Seçiniz"), f.options.map(o => /*#__PURE__*/React.createElement("option", {
+      key: o,
+      value: o
+    }, o)));
+  }
+  return /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    type: f.type,
+    value: value || "",
+    placeholder: f.label,
+    onChange: e => onChange(e.target.value)
+  });
+}
+function CrudSection({
+  sectionKey,
+  data,
+  onAdd,
+  onDelete,
+  onToggle
+}) {
+  const cfg = SECTIONS[sectionKey];
+  const [form, setForm] = useState({});
+  const [query, setQuery] = useState("");
+  const [error, setError] = useState("");
+  const filtered = useMemo(() => {
+    if (!query.trim()) return data;
+    const q = query.toLowerCase();
+    return data.filter(row => Object.values(row).join(" ").toLowerCase().includes(q));
+  }, [data, query]);
+  const submit = () => {
+    const missing = cfg.fields.filter(f => f.required && !form[f.key]);
+    if (missing.length) {
+      setError(`${missing.map(m => m.label).join(", ")} zorunlu`);
+      return;
+    }
+    setError("");
+    onAdd({
+      id: uid(),
+      ...form,
+      [cfg.toggle?.key]: false
+    });
+    setForm({});
+  };
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(SectionHeader, {
+    icon: cfg.icon,
+    title: cfg.label,
+    accent: cfg.accent,
+    count: data.length
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      marginBottom: 20
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-4"
+  }, cfg.fields.map(f => /*#__PURE__*/React.createElement(Field, {
+    key: f.key,
+    f: f,
+    value: form[f.key],
+    onChange: v => setForm(s => ({
+      ...s,
+      [f.key]: v
+    }))
+  }))), error && /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: "#fb7185",
+      fontSize: 12,
+      marginTop: 8
+    }
+  }, error), /*#__PURE__*/React.createElement("button", {
+    className: "btn",
+    style: {
+      marginTop: 12
+    },
+    onClick: submit
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "plus",
+    size: 14
+  }), " Ekle")), /*#__PURE__*/React.createElement("div", {
+    className: "row gap-2",
+    style: {
+      marginBottom: 12
+    }
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "search",
+    size: 14,
+    className: "",
+    style: {
+      color: "#64748b"
+    }
+  }), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    style: {
+      maxWidth: 260,
+      background: "transparent",
+      border: "none",
+      borderBottom: "1px solid var(--border2)",
+      borderRadius: 0,
+      padding: "6px 2px"
+    },
+    placeholder: "Ara...",
+    value: query,
+    onChange: e => setQuery(e.target.value)
+  })), filtered.length === 0 && /*#__PURE__*/React.createElement("div", {
+    className: "list-empty"
+  }, "Henüz kayıt yok. Yukarıdan ekleyebilirsin."), filtered.map(row => /*#__PURE__*/React.createElement("div", {
+    key: row.id,
+    className: "list-row"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row wrap gap-3",
+    style: {
+      fontSize: 13
+    }
+  }, cfg.fields.map(f => {
+    const val = row[f.key];
+    if (!val) return null;
+    const display = f.type === "number" ? money(val) : val;
+    return /*#__PURE__*/React.createElement("span", {
+      key: f.key,
+      style: f.key === cfg.fields[0].key ? {
+        color: "#f1f5f9",
+        fontWeight: 500
+      } : {
+        color: "#94a3b8"
+      }
+    }, display);
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "row gap-2"
+  }, cfg.toggle && /*#__PURE__*/React.createElement("button", {
+    className: `toggle-pill ${row[cfg.toggle.key] ? "on" : ""}`,
+    onClick: () => onToggle(row.id)
+  }, row[cfg.toggle.key] ? cfg.toggle.onLabel : cfg.toggle.offLabel), /*#__PURE__*/React.createElement("button", {
+    className: "btn-icon",
+    onClick: () => onDelete(row.id)
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "trash",
+    size: 15
+  }))))));
+}
+function StatCard({
+  label,
+  value,
+  sub,
+  accent
+}) {
+  const a = ACCENT[accent];
+  return /*#__PURE__*/React.createElement("div", {
+    className: "stat"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "stat-label",
+    style: {
+      color: a.color
+    }
+  }, label), /*#__PURE__*/React.createElement("div", {
+    className: "stat-value"
+  }, value), sub && /*#__PURE__*/React.createElement("div", {
+    className: "stat-sub"
+  }, sub));
+}
+function RateCard({
+  label,
+  value,
+  change,
+  unit,
+  hidden
+}) {
+  const up = Number(change) >= 0;
+  return /*#__PURE__*/React.createElement("div", {
+    className: "rate-card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "rate-label"
+  }, label), /*#__PURE__*/React.createElement("div", {
+    className: `rate-value ${hidden ? "blurred" : ""}`
+  }, unit || "", Number(value).toLocaleString("tr-TR", {
+    maximumFractionDigits: 2
+  })), /*#__PURE__*/React.createElement("div", {
+    className: `rate-change ${up ? "up" : "down"}`
+  }, up ? "▲" : "▼", " ", Math.abs(Number(change) || 0), "%"));
+}
+function EditPanel({
+  title,
+  fields,
+  values,
+  onSave,
+  onClose
+}) {
+  const [draft, setDraft] = useState(values);
+  return /*#__PURE__*/React.createElement("div", {
+    className: "edit-panel"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row between",
+    style: {
+      marginBottom: 10
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600,
+      color: "#fcd34d"
+    }
+  }, title, " — Düzenle"), /*#__PURE__*/React.createElement("button", {
+    className: "btn-icon",
+    onClick: onClose
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "x",
+    size: 15
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-3"
+  }, fields.map(f => /*#__PURE__*/React.createElement("div", {
+    key: f.key
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "label"
+  }, f.label), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    type: f.type || "number",
+    value: draft[f.key] ?? "",
+    onChange: e => setDraft(d => ({
+      ...d,
+      [f.key]: f.type === "text" ? e.target.value : Number(e.target.value)
+    }))
+  })))), /*#__PURE__*/React.createElement("button", {
+    className: "btn",
+    style: {
+      marginTop: 10,
+      fontSize: 12
+    },
+    onClick: () => onSave(draft)
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "save",
+    size: 13
+  }), " Kaydet"));
+}
+function Dashboard({
+  appData,
+  setPage,
+  persist
+}) {
+  const [hideNumbers, setHideNumbers] = useState(false);
+  const [editRates, setEditRates] = useState(false);
+  const [editMarket, setEditMarket] = useState(false);
+  const [editSocial, setEditSocial] = useState(false);
+  const [ratesLoading, setRatesLoading] = useState(false);
+  const [ratesError, setRatesError] = useState("");
+  const autoFetchedRef = useRef(false);
+  const rates = appData.rates;
+  const refreshRates = async () => {
+    setRatesLoading(true);
+    setRatesError("");
+    try {
+      const fresh = await fetchLiveRates(rates);
+      persist({
+        ...appData,
+        rates: fresh
+      });
+    } catch (e) {
+      setRatesError("Otomatik güncelleme başarısız — bağlantı sorunu olabilir, elle girebilirsin.");
+    } finally {
+      setRatesLoading(false);
+    }
+  };
+  useEffect(() => {
+    const stale = !rates.updatedAt || Date.now() - new Date(rates.updatedAt).getTime() > 1000 * 60 * 30;
+    if (stale && !autoFetchedRef.current) {
+      autoFetchedRef.current = true;
+      refreshRates();
+    }
+  }, []);
+  const openTasks = appData.tasks.filter(t => !t.completed).length;
+  const upcomingAppt = appData.appointments.length;
+  const totalIncome = appData.income.reduce((s, i) => s + (Number(i.amount) || 0), 0);
+  const totalExpense = appData.expenses.reduce((s, e) => s + (Number(e.amount) || 0), 0);
+  const net = totalIncome - totalExpense;
+  const today = todayISO();
+  const dueToday = appData.expenses.filter(e => !e.paid && e.dueDate === today);
+  const unpaid = appData.expenses.filter(e => !e.paid);
+  const market = appData.marketStats;
+  const social = appData.socialPlan;
+  const socialPct = social.totalContent > 0 ? Math.round(social.doneContent / social.totalContent * 100) : 0;
+  const saveRates = draft => {
+    persist({
+      ...appData,
+      rates: {
+        ...draft,
+        updatedAt: new Date().toISOString()
+      }
+    });
+    setEditRates(false);
+  };
+  const saveMarket = draft => {
+    persist({
+      ...appData,
+      marketStats: draft
+    });
+    setEditMarket(false);
+  };
+  const saveSocial = draft => {
+    persist({
+      ...appData,
+      socialPlan: draft
+    });
+    setEditSocial(false);
+  };
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "row between wrap gap-3",
+    style: {
+      marginBottom: 24
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "eyebrow"
+  }, APP_NAME, " · ", APP_SUB), /*#__PURE__*/React.createElement("h1", {
+    className: "h1"
+  }, "Panel")), /*#__PURE__*/React.createElement("div", {
+    className: "row gap-2 wrap"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row gap-2",
+    style: {
+      background: "var(--panel)",
+      border: "1px solid var(--border)",
+      borderRadius: 10,
+      padding: "7px 12px"
+    }
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "search",
+    size: 14,
+    style: {
+      color: "#64748b"
+    }
+  }), /*#__PURE__*/React.createElement("input", {
+    placeholder: "Her yerde ara...",
+    style: {
+      background: "transparent",
+      border: "none",
+      outline: "none",
+      color: "#cbd5e1",
+      fontSize: 13,
+      width: 140
+    }
+  })), /*#__PURE__*/React.createElement("button", {
+    className: "btn-ghost",
+    style: {
+      display: "inline-flex",
+      alignItems: "center",
+      gap: 6,
+      fontSize: 12,
+      padding: "7px 12px",
+      borderRadius: 10
+    },
+    onClick: () => setHideNumbers(h => !h)
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: hideNumbers ? "eye" : "eyeOff",
+    size: 13
+  }), " ", hideNumbers ? "Rakamları Göster" : "Rakamları Gizle"), /*#__PURE__*/React.createElement("span", {
+    className: "badge badge-ok"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "badge-dot"
+  }), "Sistem Aktif"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 12,
+      color: "#64748b"
+    }
+  }, new Date().toLocaleDateString("tr-TR")))), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-2",
+    style: {
+      marginBottom: 20
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "card",
+    style: {
+      textAlign: "left",
+      border: "1px solid var(--border)"
+    },
+    onClick: () => setPage("tasks")
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row between"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "eyebrow",
+    style: {
+      marginBottom: 4
+    }
+  }, "Hızlı Erişim"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      color: "#cbd5e1"
+    }
+  }, "Görevler")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 30,
+      fontWeight: 600
+    }
+  }, openTasks)), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: "#64748b",
+      marginTop: 4
+    }
+  }, "açık")), /*#__PURE__*/React.createElement("button", {
+    className: "card",
+    style: {
+      textAlign: "left",
+      border: "1px solid var(--border)"
+    },
+    onClick: () => setPage("appointments")
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row between"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "eyebrow",
+    style: {
+      color: "#6ee7b7",
+      marginBottom: 4
+    }
+  }, "Hızlı Erişim"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      color: "#cbd5e1"
+    }
+  }, "Randevular")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 30,
+      fontWeight: 600
+    }
+  }, upcomingAppt)), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: "#64748b",
+      marginTop: 4
+    }
+  }, "aktif"))), dueToday.length > 0 && /*#__PURE__*/React.createElement("div", {
+    className: "alert",
+    onClick: () => setPage("expenses")
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "alert",
+    size: 18,
+    style: {
+      color: "#fda4af",
+      flexShrink: 0
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "alert-text"
+  }, /*#__PURE__*/React.createElement("b", null, "Kart Ödeme Alarmı"), " — bugün son ödeme günü olan ", dueToday.length, " ödeme var"), /*#__PURE__*/React.createElement(Icon, {
+    name: "chevron",
+    size: 16,
+    style: {
+      color: "#fda4af",
+      marginLeft: "auto"
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      marginBottom: 20
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row between",
+    style: {
+      marginBottom: 4
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row gap-2"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "dollar",
+    size: 15,
+    style: {
+      color: "#fcd34d"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600
+    }
+  }, "Güncel Piyasalar — Döviz ve Altın")), /*#__PURE__*/React.createElement("div", {
+    className: "row gap-2"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn-ghost",
+    style: {
+      display: "inline-flex",
+      alignItems: "center",
+      gap: 5,
+      fontSize: 11,
+      padding: "5px 10px",
+      borderRadius: 8
+    },
+    onClick: refreshRates,
+    disabled: ratesLoading
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "refresh",
+    size: 13,
+    style: ratesLoading ? {
+      animation: "spin 1s linear infinite"
+    } : {}
+  }), " ", ratesLoading ? "Güncelleniyor" : "Yenile"), /*#__PURE__*/React.createElement("button", {
+    className: "btn-icon",
+    onClick: () => setEditRates(v => !v)
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "pencil",
+    size: 14
+  })))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: ratesError ? "#fb7185" : "#64748b",
+      marginBottom: 12
+    }
+  }, ratesError || (rates.updatedAt ? `Otomatik güncellendi: ${new Date(rates.updatedAt).toLocaleString("tr-TR")} · Kaynak: Frankfurter & Gold-API` : "Güncelleniyor...")), editRates && /*#__PURE__*/React.createElement(EditPanel, {
+    title: "Döviz ve Altın",
+    values: rates,
+    onClose: () => setEditRates(false),
+    onSave: saveRates,
+    fields: [{
+      key: "usd",
+      label: "Dolar (₺)"
+    }, {
+      key: "usdChange",
+      label: "Dolar % Değişim"
+    }, {
+      key: "eur",
+      label: "Euro (₺)"
+    }, {
+      key: "eurChange",
+      label: "Euro % Değişim"
+    }, {
+      key: "goldOns",
+      label: "Altın Ons ($)"
+    }, {
+      key: "goldOnsChange",
+      label: "Ons % Değişim"
+    }, {
+      key: "goldGram",
+      label: "Altın Gram (₺)"
+    }, {
+      key: "goldGramChange",
+      label: "Gram % Değişim"
+    }, {
+      key: "ataAltin",
+      label: "Ata Altın (₺)"
+    }, {
+      key: "ataAltinChange",
+      label: "Ata % Değişim"
+    }]
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "row wrap gap-3"
+  }, /*#__PURE__*/React.createElement(RateCard, {
+    label: "Dolar",
+    value: rates.usd,
+    change: rates.usdChange,
+    unit: "₺",
+    hidden: hideNumbers
+  }), /*#__PURE__*/React.createElement(RateCard, {
+    label: "Euro",
+    value: rates.eur,
+    change: rates.eurChange,
+    unit: "₺",
+    hidden: hideNumbers
+  }), /*#__PURE__*/React.createElement(RateCard, {
+    label: "Altın (Ons)",
+    value: rates.goldOns,
+    change: rates.goldOnsChange,
+    unit: "$",
+    hidden: hideNumbers
+  }), /*#__PURE__*/React.createElement(RateCard, {
+    label: "Altın Gram",
+    value: rates.goldGram,
+    change: rates.goldGramChange,
+    unit: "₺",
+    hidden: hideNumbers
+  }), /*#__PURE__*/React.createElement(RateCard, {
+    label: "Ata Altın",
+    value: rates.ataAltin,
+    change: rates.ataAltinChange,
+    unit: "₺",
+    hidden: hideNumbers
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      marginBottom: 20
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row between",
+    style: {
+      marginBottom: 12
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row gap-2"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "coins",
+    size: 15,
+    style: {
+      color: "#6ee7b7"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600
+    }
+  }, "Piyasa Arz Hafızası — ", market.region, " Arz ve Site Fiyatları")), /*#__PURE__*/React.createElement("button", {
+    className: "btn-icon",
+    onClick: () => setEditMarket(v => !v)
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "pencil",
+    size: 14
+  }))), editMarket && /*#__PURE__*/React.createElement(EditPanel, {
+    title: "Piyasa Arz Hafızası",
+    values: market,
+    onClose: () => setEditMarket(false),
+    onSave: saveMarket,
+    fields: [{
+      key: "region",
+      label: "Bölge Adı",
+      type: "text"
+    }, {
+      key: "forSaleCount",
+      label: "Satılık Konut İlanı"
+    }, {
+      key: "forRentCount",
+      label: "Kiralık Konut İlanı"
+    }, {
+      key: "avgSalePrice",
+      label: "Ort. Satılık Toplam Site (₺)"
+    }, {
+      key: "avgOtherPrice",
+      label: "Ort. Diğer Site (₺)"
+    }]
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-4"
+  }, /*#__PURE__*/React.createElement(StatCard, {
+    label: "Satılık Konut İlanı",
+    value: hideNumbers ? "•••" : market.forSaleCount,
+    accent: "teal"
+  }), /*#__PURE__*/React.createElement(StatCard, {
+    label: "Kiralık Konut İlanı",
+    value: hideNumbers ? "•••" : market.forRentCount,
+    accent: "rose"
+  }), /*#__PURE__*/React.createElement(StatCard, {
+    label: "Ort. Satılık Toplam Site",
+    value: hideNumbers ? "•••" : money(market.avgSalePrice),
+    accent: "gold"
+  }), /*#__PURE__*/React.createElement(StatCard, {
+    label: "Ort. Diğer Site",
+    value: hideNumbers ? "•••" : money(market.avgOtherPrice),
+    accent: "gold"
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-2",
+    style: {
+      marginBottom: 20
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row between",
+    style: {
+      marginBottom: 10
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row gap-2"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "megaphone",
+    size: 15,
+    style: {
+      color: "#fcd34d"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600
+    }
+  }, "Sosyal Medya Planı")), /*#__PURE__*/React.createElement("button", {
+    className: "btn-icon",
+    onClick: () => setEditSocial(v => !v)
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "pencil",
+    size: 14
+  }))), editSocial && /*#__PURE__*/React.createElement(EditPanel, {
+    title: "Sosyal Medya Planı",
+    values: social,
+    onClose: () => setEditSocial(false),
+    onSave: saveSocial,
+    fields: [{
+      key: "activeAccounts",
+      label: "Aktif Hesap"
+    }, {
+      key: "totalContent",
+      label: "Haftalık Hedef İçerik"
+    }, {
+      key: "doneContent",
+      label: "Tamamlanan İçerik"
+    }]
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: "#94a3b8",
+      marginBottom: 8
+    }
+  }, "Bu haftaki paylaşım hedefleri · ", social.activeAccounts, " aktif hesap · ", Math.max(social.totalContent - social.doneContent, 0), " içerik kaldı"), /*#__PURE__*/React.createElement("div", {
+    className: "bar-track",
+    style: {
+      marginBottom: 8
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bar-fill",
+    style: {
+      width: `${socialPct}%`
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "row between",
+    style: {
+      fontSize: 12
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "#64748b"
+    }
+  }, "%", socialPct, " tamamlandı"), /*#__PURE__*/React.createElement("div", {
+    className: "row gap-2"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "badge badge-ok"
+  }, social.doneContent, " Tamamlandı"), /*#__PURE__*/React.createElement("span", {
+    className: "badge"
+  }, Math.max(social.totalContent - social.doneContent, 0), " Geride")))), /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600,
+      marginBottom: 12
+    }
+  }, "Bugünün Finans ve Operasyon"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row between",
+    style: {
+      marginBottom: 6
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "#94a3b8"
+    }
+  }, "Net Bakiye"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: net >= 0 ? "#6ee7b7" : "#fda4af"
+    }
+  }, hideNumbers ? "•••" : money(net))), /*#__PURE__*/React.createElement("div", {
+    className: "row between",
+    style: {
+      marginBottom: 6
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "#94a3b8"
+    }
+  }, "Toplam Gelir"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "#cbd5e1"
+    }
+  }, hideNumbers ? "•••" : money(totalIncome))), /*#__PURE__*/React.createElement("div", {
+    className: "row between",
+    style: {
+      marginBottom: 6
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "#94a3b8"
+    }
+  }, "Toplam Gider"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "#cbd5e1"
+    }
+  }, hideNumbers ? "•••" : money(totalExpense))), /*#__PURE__*/React.createElement("div", {
+    className: "row between",
+    style: {
+      marginBottom: 6
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "#94a3b8"
+    }
+  }, "Bekleyen Ödemeler"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "#cbd5e1"
+    }
+  }, unpaid.length)), /*#__PURE__*/React.createElement("div", {
+    className: "row between"
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "#94a3b8"
+    }
+  }, "Aktif Portföy"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "#cbd5e1"
+    }
+  }, appData.portfolio.filter(p => p.status === "Aktif").length, " / ", appData.portfolio.length))))), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-2"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600,
+      marginBottom: 10
+    }
+  }, "Yaklaşan Görevler"), appData.tasks.filter(t => !t.completed).slice(0, 5).length === 0 && /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: "#64748b",
+      fontSize: 13
+    }
+  }, "Bekleyen görev yok."), appData.tasks.filter(t => !t.completed).slice(0, 5).map(t => /*#__PURE__*/React.createElement("div", {
+    key: t.id,
+    className: "row between",
+    style: {
+      fontSize: 13,
+      marginBottom: 6
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "#cbd5e1"
+    }
+  }, t.title), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "#64748b"
+    }
+  }, t.dueDate || "-")))), /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600,
+      marginBottom: 10
+    }
+  }, "Yaklaşan Randevular"), appData.appointments.slice(0, 5).length === 0 && /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: "#64748b",
+      fontSize: 13
+    }
+  }, "Kayıtlı randevu yok."), appData.appointments.slice(0, 5).map(a => /*#__PURE__*/React.createElement("div", {
+    key: a.id,
+    className: "row between",
+    style: {
+      fontSize: 13,
+      marginBottom: 6
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "#cbd5e1"
+    }
+  }, a.title), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "#64748b"
+    }
+  }, a.date, " ", a.time))))));
+}
+function Analytics({
+  appData
+}) {
+  const totalIncome = appData.income.reduce((s, i) => s + (Number(i.amount) || 0), 0);
+  const totalExpense = appData.expenses.reduce((s, e) => s + (Number(e.amount) || 0), 0);
+  const statusCounts = ["Aktif", "Beklemede", "Satıldı"].map(s => ({
+    label: s,
+    count: appData.portfolio.filter(p => p.status === s).length
+  }));
+  const maxStatus = Math.max(1, ...statusCounts.map(s => s.count));
+  const maxFin = Math.max(1, totalIncome, totalExpense);
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(SectionHeader, {
+    icon: "chart",
+    title: "Analiz & Araçlar",
+    accent: "teal"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-2"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600,
+      marginBottom: 16
+    }
+  }, "Gelir / Gider Karşılaştırması"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: 10
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row between",
+    style: {
+      fontSize: 12,
+      color: "#94a3b8",
+      marginBottom: 4
+    }
+  }, /*#__PURE__*/React.createElement("span", null, "Gelir"), /*#__PURE__*/React.createElement("span", null, money(totalIncome))), /*#__PURE__*/React.createElement("div", {
+    className: "bar-track"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bar-fill",
+    style: {
+      width: `${totalIncome / maxFin * 100}%`,
+      background: "#34d399"
+    }
+  }))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "row between",
+    style: {
+      fontSize: 12,
+      color: "#94a3b8",
+      marginBottom: 4
+    }
+  }, /*#__PURE__*/React.createElement("span", null, "Gider"), /*#__PURE__*/React.createElement("span", null, money(totalExpense))), /*#__PURE__*/React.createElement("div", {
+    className: "bar-track"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bar-fill",
+    style: {
+      width: `${totalExpense / maxFin * 100}%`,
+      background: "#fb7185"
+    }
+  })))), /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600,
+      marginBottom: 16
+    }
+  }, "Portföy Durum Dağılımı"), statusCounts.map(s => /*#__PURE__*/React.createElement("div", {
+    key: s.label,
+    style: {
+      marginBottom: 10
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row between",
+    style: {
+      fontSize: 12,
+      color: "#94a3b8",
+      marginBottom: 4
+    }
+  }, /*#__PURE__*/React.createElement("span", null, s.label), /*#__PURE__*/React.createElement("span", null, s.count)), /*#__PURE__*/React.createElement("div", {
+    className: "bar-track"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bar-fill",
+    style: {
+      width: `${s.count / maxStatus * 100}%`
+    }
+  })))))));
+}
+function CalcTools() {
+  const [salePrice, setSalePrice] = useState("");
+  const [rate, setRate] = useState("2");
+  const commission = (Number(salePrice) || 0) * (Number(rate) / 100 || 0);
+  const [principal, setPrincipal] = useState("");
+  const [months, setMonths] = useState("12");
+  const [annualRate, setAnnualRate] = useState("3");
+  const r = (Number(annualRate) || 0) / 100 / 12;
+  const n = Number(months) || 1;
+  const p = Number(principal) || 0;
+  const monthlyPayment = r === 0 ? p / n : p * r / (1 - Math.pow(1 + r, -n));
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(SectionHeader, {
+    icon: "calc",
+    title: "Hesaplama Araçları",
+    accent: "gold"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-2"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600,
+      marginBottom: 14
+    }
+  }, "Komisyon Hesaplayıcı"), /*#__PURE__*/React.createElement("label", {
+    className: "label"
+  }, "Satış Bedeli (₺)"), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    type: "number",
+    value: salePrice,
+    onChange: e => setSalePrice(e.target.value),
+    style: {
+      marginBottom: 10
+    }
+  }), /*#__PURE__*/React.createElement("label", {
+    className: "label"
+  }, "Komisyon Oranı (%)"), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    type: "number",
+    value: rate,
+    onChange: e => setRate(e.target.value),
+    style: {
+      marginBottom: 14
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "row between",
+    style: {
+      borderTop: "1px solid var(--border)",
+      paddingTop: 10
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 13,
+      color: "#94a3b8"
+    }
+  }, "Komisyon Tutarı"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 17,
+      fontWeight: 600,
+      color: "#fcd34d"
+    }
+  }, money(commission)))), /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600,
+      marginBottom: 14
+    }
+  }, "Kredi / Taksit Hesaplayıcı"), /*#__PURE__*/React.createElement("label", {
+    className: "label"
+  }, "Anapara (₺)"), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    type: "number",
+    value: principal,
+    onChange: e => setPrincipal(e.target.value),
+    style: {
+      marginBottom: 10
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-2"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "label"
+  }, "Vade (Ay)"), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    type: "number",
+    value: months,
+    onChange: e => setMonths(e.target.value)
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "label"
+  }, "Yıllık Faiz (%)"), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    type: "number",
+    value: annualRate,
+    onChange: e => setAnnualRate(e.target.value)
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "row between",
+    style: {
+      borderTop: "1px solid var(--border)",
+      paddingTop: 10,
+      marginTop: 14
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 13,
+      color: "#94a3b8"
+    }
+  }, "Aylık Taksit"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 17,
+      fontWeight: 600,
+      color: "#fcd34d"
+    }
+  }, money(monthlyPayment))))));
+}
+function AIAssistant({
+  appData
+}) {
+  const [apiKey, setApiKey] = useState("");
+  const [keySaved, setKeySaved] = useState(false);
+  const [keyInput, setKeyInput] = useState("");
+  const [messages, setMessages] = useState([{
+    role: "assistant",
+    content: "Merhaba! İlan metni yazabilir, günün özetini çıkarabilir, sosyal medya içeriği önerebilir veya piyasa verilerini yorumlayabilirim."
+  }]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const scrollRef = useRef(null);
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await AppStorage.get("groqApiKey", false);
+        if (res && res.value) {
+          setApiKey(res.value);
+          setKeySaved(true);
+        }
+      } catch (e) {}
+    })();
+  }, []);
+  useEffect(() => {
+    if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  }, [messages, loading]);
+  const saveKey = async () => {
+    if (!keyInput.trim()) return;
+    try {
+      await AppStorage.set("groqApiKey", keyInput.trim(), false);
+      setApiKey(keyInput.trim());
+      setKeySaved(true);
+      setKeyInput("");
+    } catch (e) {
+      setError("API anahtarı kaydedilemedi.");
+    }
+  };
+  const clearKey = async () => {
+    try {
+      await AppStorage.delete("groqApiKey", false);
+    } catch (e) {}
+    setApiKey("");
+    setKeySaved(false);
+  };
+  const contextSummary = () => {
+    const openTasks = appData.tasks.filter(t => !t.completed).length;
+    const unpaid = appData.expenses.filter(e => !e.paid);
+    const totalIncome = appData.income.reduce((s, i) => s + (Number(i.amount) || 0), 0);
+    const totalExpense = appData.expenses.reduce((s, e) => s + (Number(e.amount) || 0), 0);
+    return `Ofis: Murat İyicioğlu Gayrimenkul. Açık görev: ${openTasks}. Randevu: ${appData.appointments.length}. Bekleyen ödeme: ${unpaid.length}. Toplam gelir: ${totalIncome}₺, gider: ${totalExpense}₺. Aktif portföy: ${appData.portfolio.filter(p => p.status === "Aktif").length}. İlanlar: ${appData.portfolio.slice(0, 8).map(p => `${p.title} (${p.type}, ${p.price}₺, ${p.status})`).join("; ") || "yok"}.`;
+  };
+  const send = async () => {
+    if (!input.trim() || loading) return;
+    const userMsg = {
+      role: "user",
+      content: input.trim()
+    };
+    const nextMessages = [...messages, userMsg];
+    setMessages(nextMessages);
+    setInput("");
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: "openai/gpt-oss-120b",
+          messages: [{
+            role: "system",
+            content: `Sen Murat İyicioğlu Gayrimenkul için çalışan bir emlak ofisi asistanısın. Türkçe, kısa ve iş odaklı yanıt ver. Sadece elindeki verilere dayan; bilmediğin veya elinde olmayan bir bilgiyi ASLA uydurma — bunun yerine açıkça "bu bilgi elimde yok" de. Güncel ofis verileri: ${contextSummary()}`
+          }, ...nextMessages],
+          temperature: 0.4
+        })
+      });
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        throw new Error(errBody?.error?.message || `İstek başarısız (${res.status})`);
+      }
+      const data = await res.json();
+      const reply = data?.choices?.[0]?.message?.content?.trim() || "Yanıt alınamadı.";
+      setMessages(m => [...m, {
+        role: "assistant",
+        content: reply
+      }]);
+    } catch (e) {
+      setError(e.message || "Bağlantı hatası. API anahtarını kontrol et.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(SectionHeader, {
+    icon: "bot",
+    title: "AI Asistan",
+    accent: "teal"
+  }), !keySaved ? /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      marginBottom: 20
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row gap-2",
+    style: {
+      marginBottom: 8
+    }
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "key",
+    size: 15,
+    style: {
+      color: "#fcd34d"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600
+    }
+  }, "Groq API Anahtarı")), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: 12,
+      color: "#64748b",
+      marginBottom: 12
+    }
+  }, "console.groq.com üzerinden ücretsiz bir API anahtarı alabilirsin. Anahtar ", STORAGE_BACKEND === "cloud" ? "Claude bulut depolamanda" : "bu tarayıcının yerel deposunda (localStorage)", " saklanır — paylaşırsan anahtarın da görünür olabileceğini unutma."), /*#__PURE__*/React.createElement("div", {
+    className: "row gap-2"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "password",
+    className: "input",
+    placeholder: "gsk_...",
+    value: keyInput,
+    onChange: e => setKeyInput(e.target.value)
+  }), /*#__PURE__*/React.createElement("button", {
+    className: "btn",
+    onClick: saveKey
+  }, "Kaydet"))) : /*#__PURE__*/React.createElement("div", {
+    className: "chat-box"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row between",
+    style: {
+      padding: "10px 16px",
+      borderBottom: "1px solid var(--border)"
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "badge badge-ok"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "badge-dot"
+  }), "Groq bağlı"), /*#__PURE__*/React.createElement("button", {
+    onClick: clearKey,
+    style: {
+      background: "none",
+      border: "none",
+      color: "#64748b",
+      fontSize: 12,
+      cursor: "pointer"
+    }
+  }, "Anahtarı kaldır")), /*#__PURE__*/React.createElement("div", {
+    className: "disclaimer"
+  }, "⚠️ Yapay zeka yanıtları hata (halüsinasyon) içerebilir. Asistan yalnızca elindeki ofis verilerine dayanır; önemli kararlarda mutlaka doğrula."), /*#__PURE__*/React.createElement("div", {
+    className: "chat-msgs",
+    ref: scrollRef
+  }, messages.map((m, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    className: `msg ${m.role === "user" ? "user" : "bot"}`
+  }, m.content)), loading && /*#__PURE__*/React.createElement("div", {
+    className: "msg bot",
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 8
+    }
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "loader",
+    size: 13,
+    style: {
+      animation: "spin 1s linear infinite"
+    }
+  }), " yazıyor...")), error && /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "0 16px 8px",
+      fontSize: 11,
+      color: "#fb7185"
+    }
+  }, error), /*#__PURE__*/React.createElement("div", {
+    className: "row gap-2",
+    style: {
+      borderTop: "1px solid var(--border)",
+      padding: 12
+    }
+  }, /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    placeholder: "Örn: Bu haftaki 3+1 ilanlar için Instagram metni yaz",
+    value: input,
+    onChange: e => setInput(e.target.value),
+    onKeyDown: e => e.key === "Enter" && send()
+  }), /*#__PURE__*/React.createElement("button", {
+    className: "btn",
+    style: {
+      padding: "9px 12px"
+    },
+    onClick: send,
+    disabled: loading
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "send",
+    size: 15
+  })))));
+}
+
+/* ---------------- Health check ---------------- */
+function HealthCheck({
+  appData
+}) {
+  const [results, setResults] = useState(null);
+  const [running, setRunning] = useState(false);
+  const runChecks = async () => {
+    setRunning(true);
+    const out = [];
+
+    // 1. Storage
+    try {
+      const testKey = "__health_check__";
+      await AppStorage.set(testKey, "ok", false);
+      const r = await AppStorage.get(testKey, false);
+      await AppStorage.delete(testKey, false);
+      out.push({
+        name: "Yerel Depolama",
+        ok: r && r.value === "ok",
+        detail: `Veri okuma/yazma çalışıyor (${STORAGE_BACKEND === "cloud" ? "Claude Bulut Depolama" : STORAGE_BACKEND === "local" ? "Tarayıcı LocalStorage (bağımsız kullanım)" : "yok"})`
+      });
+    } catch (e) {
+      out.push({
+        name: "Yerel Depolama",
+        ok: false,
+        detail: e.message || "Depolama erişilemedi"
+      });
+    }
+
+    // 2. Veri bütünlüğü
+    const arrayKeys = ["tasks", "appointments", "income", "expenses", "bankAssets", "portfolio", "siteData", "contacts", "documents"];
+    const brokenKeys = arrayKeys.filter(k => !Array.isArray(appData[k]));
+    out.push({
+      name: "Veri Bütünlüğü",
+      ok: brokenKeys.length === 0,
+      detail: brokenKeys.length === 0 ? "Tüm bölümler geçerli" : `Bozuk alan(lar): ${brokenKeys.join(", ")}`
+    });
+
+    // 3. Döviz API
+    try {
+      const r = await fetch("https://api.frankfurter.dev/v1/latest?from=USD&to=TRY");
+      out.push({
+        name: "Döviz Kuru Bağlantısı (Frankfurter)",
+        ok: r.ok,
+        detail: r.ok ? "Bağlantı başarılı" : `HTTP ${r.status}`
+      });
+    } catch (e) {
+      out.push({
+        name: "Döviz Kuru Bağlantısı (Frankfurter)",
+        ok: false,
+        detail: "Bağlanılamadı"
+      });
+    }
+
+    // 4. Altın API
+    try {
+      const r = await fetch("https://api.gold-api.com/price/XAU");
+      out.push({
+        name: "Altın Fiyatı Bağlantısı (Gold-API)",
+        ok: r.ok,
+        detail: r.ok ? "Bağlantı başarılı" : `HTTP ${r.status}`
+      });
+    } catch (e) {
+      out.push({
+        name: "Altın Fiyatı Bağlantısı (Gold-API)",
+        ok: false,
+        detail: "Bağlanılamadı"
+      });
+    }
+
+    // 5. Groq anahtarı
+    try {
+      const r = await AppStorage.get("groqApiKey", false);
+      if (r && r.value) out.push({
+        name: "AI Asistan (Groq) Anahtarı",
+        ok: true,
+        detail: "Anahtar kayıtlı"
+      });else out.push({
+        name: "AI Asistan (Groq) Anahtarı",
+        ok: null,
+        detail: "Anahtar girilmemiş — isteğe bağlı"
+      });
+    } catch (e) {
+      out.push({
+        name: "AI Asistan (Groq) Anahtarı",
+        ok: null,
+        detail: "Kontrol edilemedi"
+      });
+    }
+
+    // 6. Kur verisi tazeliği
+    const stale = !appData.rates.updatedAt || Date.now() - new Date(appData.rates.updatedAt).getTime() > 1000 * 60 * 60 * 6;
+    out.push({
+      name: "Kur Verisi Tazeliği",
+      ok: !stale,
+      detail: stale ? "6 saatten eski, panelden yenile" : "Güncel"
+    });
+    setResults(out);
+    setRunning(false);
+  };
+  useEffect(() => {
+    runChecks();
+  }, []);
+  const failCount = results ? results.filter(r => r.ok === false).length : 0;
+  const overallOk = results && failCount === 0;
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(SectionHeader, {
+    icon: "pulse",
+    title: "Sistem Sağlığı",
+    accent: "teal"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      marginBottom: 16
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row between"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      color: "#94a3b8",
+      marginBottom: 4
+    }
+  }, "Genel Durum"), results ? /*#__PURE__*/React.createElement("span", {
+    className: `badge ${overallOk ? "badge-ok" : "badge-warn"}`,
+    style: {
+      fontSize: 13,
+      padding: "5px 14px"
+    }
+  }, overallOk ? "%100 Sağlıklı" : `${failCount} sorun bulundu`) : /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 13,
+      color: "#64748b"
+    }
+  }, "Kontrol ediliyor...")), /*#__PURE__*/React.createElement("button", {
+    className: "btn-ghost",
+    style: {
+      display: "inline-flex",
+      alignItems: "center",
+      gap: 6,
+      fontSize: 12
+    },
+    onClick: runChecks,
+    disabled: running
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "refresh",
+    size: 13,
+    style: running ? {
+      animation: "spin 1s linear infinite"
+    } : {}
+  }), " Yeniden Kontrol Et"))), results && results.map(r => /*#__PURE__*/React.createElement("div", {
+    key: r.name,
+    className: "health-row"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row gap-3"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "health-dot",
+    style: {
+      background: r.ok === true ? "#34d399" : r.ok === false ? "#fb7185" : "#64748b"
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 13,
+      color: "#e2e8f0"
+    }
+  }, r.name)), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 12,
+      color: "#94a3b8"
+    }
+  }, r.detail))));
+}
+
+/* ---------------- Error boundary ---------------- */
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      hasError: false,
+      msg: ""
+    };
+  }
+  static getDerivedStateFromError(err) {
+    return {
+      hasError: true,
+      msg: err?.message || "Bilinmeyen hata"
+    };
+  }
+  render() {
+    if (this.state.hasError) {
+      return /*#__PURE__*/React.createElement("div", {
+        style: {
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "column",
+          gap: 12,
+          padding: 20,
+          textAlign: "center"
+        }
+      }, /*#__PURE__*/React.createElement("div", {
+        style: {
+          width: 48,
+          height: 48,
+          borderRadius: 12,
+          background: "var(--rose-soft)",
+          border: "1px solid var(--rose-bd)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center"
+        }
+      }, /*#__PURE__*/React.createElement(Icon, {
+        name: "alert",
+        size: 22,
+        style: {
+          color: "#fda4af"
+        }
+      })), /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontSize: 15,
+          fontWeight: 600
+        }
+      }, "Beklenmedik bir hata oluştu"), /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontSize: 12,
+          color: "#64748b",
+          maxWidth: 340
+        }
+      }, this.state.msg, " — sayfayı yenilemeyi deneyebilirsin, verilerin tarayıcında güvenle saklı kalır."), /*#__PURE__*/React.createElement("button", {
+        className: "btn",
+        onClick: () => window.location.reload()
+      }, "Sayfayı Yenile"));
+    }
+    return this.props.children;
+  }
+}
+
+/* ---------------- App ---------------- */
+function App() {
+  const [page, setPage] = useState("dashboard");
+  const [appData, setAppData] = useState(EMPTY);
+  const [loaded, setLoaded] = useState(false);
+  const [splashFading, setSplashFading] = useState(false);
+  const [status, setStatus] = useState("");
+  const [navOpen, setNavOpen] = useState(false);
+  useEffect(() => {
+    const start = Date.now();
+    (async () => {
+      try {
+        const res = await AppStorage.get(STORAGE_KEY, false);
+        if (res && res.value) setAppData({
+          ...EMPTY,
+          ...JSON.parse(res.value)
+        });
+      } catch (e) {}
+      const elapsed = Date.now() - start;
+      const wait = Math.max(0, 550 - elapsed);
+      setTimeout(() => {
+        setLoaded(true);
+        setTimeout(() => setSplashFading(true), 50);
+      }, wait);
+    })();
+  }, []);
+  const persist = async next => {
+    setAppData(next);
+    try {
+      const res = await AppStorage.set(STORAGE_KEY, JSON.stringify(next), false);
+      setStatus(res ? "Kaydedildi" : "Kayıt hatası");
+    } catch (e) {
+      setStatus("Kayıt hatası");
+    }
+    setTimeout(() => setStatus(""), 1500);
+  };
+  const addRow = (sectionKey, row) => persist({
+    ...appData,
+    [sectionKey]: [row, ...appData[sectionKey]]
+  });
+  const deleteRow = (sectionKey, id) => persist({
+    ...appData,
+    [sectionKey]: appData[sectionKey].filter(r => r.id !== id)
+  });
+  const toggleRow = (sectionKey, id) => {
+    const cfg = SECTIONS[sectionKey];
+    persist({
+      ...appData,
+      [sectionKey]: appData[sectionKey].map(r => r.id === id ? {
+        ...r,
+        [cfg.toggle.key]: !r[cfg.toggle.key]
+      } : r)
+    });
+  };
+  const renderPage = () => {
+    if (page === "dashboard") return /*#__PURE__*/React.createElement(Dashboard, {
+      appData: appData,
+      setPage: setPage,
+      persist: persist
+    });
+    if (page === "analytics") return /*#__PURE__*/React.createElement(Analytics, {
+      appData: appData
+    });
+    if (page === "calc") return /*#__PURE__*/React.createElement(CalcTools, null);
+    if (page === "ai") return /*#__PURE__*/React.createElement(AIAssistant, {
+      appData: appData
+    });
+    if (page === "health") return /*#__PURE__*/React.createElement(HealthCheck, {
+      appData: appData
+    });
+    if (SECTIONS[page]) {
+      return /*#__PURE__*/React.createElement(CrudSection, {
+        sectionKey: page,
+        data: appData[page],
+        onAdd: row => addRow(page, row),
+        onDelete: id => deleteRow(page, id),
+        onToggle: id => toggleRow(page, id)
+      });
+    }
+    return null;
+  };
+  return /*#__PURE__*/React.createElement(React.Fragment, null, !splashFading && /*#__PURE__*/React.createElement("div", {
+    className: `splash ${loaded ? "fade" : ""}`
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "splash-icon"
+  }, "Mİ"), /*#__PURE__*/React.createElement("div", {
+    className: "spinner"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "splash-name"
+  }, APP_NAME, " ", APP_SUB, " yükleniyor...")), loaded && /*#__PURE__*/React.createElement("div", {
+    className: "app"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "menu-btn btn-ghost",
+    style: {
+      position: "fixed",
+      top: 12,
+      left: 12,
+      zIndex: 60,
+      padding: 8,
+      borderRadius: 8
+    },
+    onClick: () => setNavOpen(v => !v)
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "menu",
+    size: 18
+  })), /*#__PURE__*/React.createElement("aside", {
+    className: `sidebar ${navOpen ? "open" : ""}`
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "brand"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "brand-icon"
+  }, "Mİ"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "brand-name"
+  }, APP_NAME), /*#__PURE__*/React.createElement("div", {
+    className: "brand-sub"
+  }, APP_SUB, " Paneli"))), /*#__PURE__*/React.createElement("nav", {
+    className: "nav"
+  }, NAV_GROUPS.map(group => /*#__PURE__*/React.createElement("div", {
+    className: "nav-group",
+    key: group.title
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "nav-title"
+  }, group.title), group.items.map(item => /*#__PURE__*/React.createElement("button", {
+    key: item.key,
+    className: `nav-item ${page === item.key ? "active" : ""}`,
+    onClick: () => {
+      setPage(item.key);
+      setNavOpen(false);
+    }
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: item.icon,
+    size: 15
+  }), /*#__PURE__*/React.createElement("span", null, item.label)))))), /*#__PURE__*/React.createElement("div", {
+    className: "sidebar-footer"
+  }, /*#__PURE__*/React.createElement("span", null, todayISO()), status && /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "#34d399"
+    }
+  }, status))), /*#__PURE__*/React.createElement("main", {
+    className: "main"
+  }, renderPage())));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/*#__PURE__*/React.createElement(ErrorBoundary, null, /*#__PURE__*/React.createElement(App, null)));</script>
+</body>
+</html>
