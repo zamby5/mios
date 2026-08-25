@@ -1,0 +1,4793 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Murat İyicioğlu Gayrimenkul · Panel</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230A1120'/%3E%3Crect x='4' y='4' width='56' height='56' rx='11' fill='%23FBBF24'/%3E%3Ctext x='32' y='42' font-family='Arial, sans-serif' font-size='26' font-weight='700' fill='%230A1120' text-anchor='middle'%3EMİ%3C/text%3E%3C/svg%3E" />
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230A1120'/%3E%3Crect x='4' y='4' width='56' height='56' rx='11' fill='%23FBBF24'/%3E%3Ctext x='32' y='42' font-family='Arial, sans-serif' font-size='26' font-weight='700' fill='%230A1120' text-anchor='middle'%3EMİ%3C/text%3E%3C/svg%3E" />
+<meta name="theme-color" content="#0A1120" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin></script>
+<style>
+  :root{
+    --bg:#0A1120; --panel:#101a30; --panel2:#0D1526; --border:#1c2843; --border2:#233151;
+    --text:#e7ecf5; --muted:#94a3b8; --muted2:#64748b;
+    --amber:#fbbf24; --amber-soft:rgba(251,191,36,.1); --amber-bd:rgba(251,191,36,.3);
+    --emerald:#34d399; --emerald-soft:rgba(52,211,153,.1); --emerald-bd:rgba(52,211,153,.3);
+    --rose:#fb7185; --rose-soft:rgba(251,113,133,.1); --rose-bd:rgba(251,113,133,.3);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;}
+  #root{min-height:100vh;}
+  ::-webkit-scrollbar{width:8px;height:8px;}
+  ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:8px;}
+  button{font-family:inherit;cursor:pointer;}
+  input,select{font-family:inherit;}
+  a{color:inherit;}
+
+  /* Splash */
+  .splash{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:999;transition:opacity .4s ease;}
+  .splash.fade{opacity:0;pointer-events:none;}
+  .splash-icon{width:64px;height:64px;border-radius:16px;background:var(--amber);display:flex;align-items:center;justify-content:center;color:var(--bg);font-weight:800;font-size:22px;box-shadow:0 0 0 1px var(--border), 0 20px 50px rgba(251,191,36,.15);animation:pulse 1.6s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.06);}}
+  .splash-name{font-size:14px;color:var(--muted);letter-spacing:.04em;}
+  .spinner{width:22px;height:22px;border-radius:50%;border:2.5px solid var(--border2);border-top-color:var(--amber);animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* Layout */
+  .app{min-height:100vh;display:flex;}
+  .sidebar{width:256px;flex-shrink:0;background:#0C1424;border-right:1px solid var(--border);padding:16px;display:flex;flex-direction:column;}
+  .brand{display:flex;align-items:center;gap:10px;padding:10px 8px 14px;}
+  .brand-icon{width:36px;height:36px;border-radius:10px;background:var(--amber);display:flex;align-items:center;justify-content:center;color:var(--bg);font-weight:800;font-size:13px;flex-shrink:0;}
+  .brand-name{font-size:14px;font-weight:700;color:#fcd34d;line-height:1.2;}
+  .brand-sub{font-size:10px;color:var(--muted2);margin-top:2px;}
+  .nav{flex:1;overflow-y:auto;}
+  .nav-group{margin-bottom:18px;}
+  .nav-title{font-size:10px;letter-spacing:.08em;color:#475569;padding:0 10px;margin-bottom:6px;}
+  .nav-item{width:100%;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;font-size:13px;color:var(--muted);background:transparent;border:1px solid transparent;text-align:left;}
+  .nav-item:hover{color:#e2e8f0;background:#121c33;}
+  .nav-item.active{color:#fcd34d;background:var(--amber-soft);border-color:var(--amber-bd);}
+  .sidebar-footer{font-size:10px;color:#475569;padding:10px 8px 0;border-top:1px solid var(--border);margin-top:10px;display:flex;justify-content:space-between;}
+  .main{flex:1;padding:24px;overflow-y:auto;max-height:100vh;}
+  @media (max-width:820px){.sidebar{position:fixed;left:-260px;transition:left .2s;height:100vh;z-index:50;}.sidebar.open{left:0;}.menu-btn{display:inline-flex !important;}}
+  .menu-btn{display:none;}
+
+  /* Generic */
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:18px;}
+  .h1{font-size:22px;font-weight:600;color:#f1f5f9;margin:0;}
+  .eyebrow{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#fcd34d;opacity:.85;margin-bottom:4px;}
+  .row{display:flex;align-items:center;}
+  .between{justify-content:space-between;}
+  .gap-2{gap:8px;} .gap-3{gap:12px;} .wrap{flex-wrap:wrap;}
+  .grid{display:grid;gap:14px;}
+  .grid-2{grid-template-columns:repeat(2,1fr);} .grid-3{grid-template-columns:repeat(3,1fr);} .grid-4{grid-template-columns:repeat(4,1fr);}
+  @media (max-width:820px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr 1fr;}}
+  @media (max-width:520px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr;}}
+
+  .btn{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:9px 15px;border-radius:10px;border:1px solid transparent;background:var(--amber);color:var(--bg);}
+  .btn:hover{filter:brightness(1.08);}
+  .btn:disabled{opacity:.5;cursor:not-allowed;}
+  .btn-ghost{background:var(--panel);border:1px solid var(--border);color:#cbd5e1;font-weight:500;}
+  .btn-ghost:hover{border-color:var(--amber-bd);color:#fcd34d;}
+  .btn-icon{background:transparent;border:none;color:#64748b;padding:4px;border-radius:6px;}
+  .btn-icon:hover{color:#fb7185;}
+
+  .input,.select{width:100%;background:var(--panel2);border:1px solid var(--border2);border-radius:10px;padding:9px 12px;font-size:13px;color:var(--text);outline:none;}
+  .input::placeholder{color:#475569;}
+  .input:focus,.select:focus{border-color:rgba(251,191,36,.5);}
+  .label{font-size:11px;color:var(--muted2);display:block;margin-bottom:4px;}
+
+  .badge{font-size:11px;padding:3px 10px;border-radius:999px;border:1px solid var(--border2);color:var(--muted);}
+  .badge-ok{background:var(--emerald-soft);border-color:var(--emerald-bd);color:#6ee7b7;}
+  .badge-warn{background:var(--rose-soft);border-color:var(--rose-bd);color:#fda4af;}
+  .badge-dot{width:6px;height:6px;border-radius:50%;background:var(--emerald);display:inline-block;margin-right:5px;}
+
+  .alert{cursor:pointer;background:var(--rose-soft);border:1px solid var(--rose-bd);border-radius:16px;padding:14px 18px;display:flex;align-items:center;gap:10px;margin-bottom:18px;}
+  .alert-text{font-size:13px;color:#ffe4e6;}
+
+  .stat{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:16px;flex:1;min-width:150px;}
+  .stat-label{font-size:11px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px;}
+  .stat-value{font-size:22px;font-weight:600;color:#f1f5f9;}
+  .stat-sub{font-size:11px;color:var(--muted2);margin-top:4px;}
+
+  .rate-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 14px;flex:1;min-width:130px;}
+  .rate-label{font-size:11px;color:var(--muted2);margin-bottom:2px;}
+  .rate-value{font-size:17px;font-weight:600;color:#f1f5f9;}
+  .rate-change{font-size:11px;margin-top:2px;}
+  .up{color:#34d399;} .down{color:#fb7185;}
+  .blurred{filter:blur(4px);user-select:none;}
+
+  .list-row{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:8px;}
+  .list-row:hover{border-color:#2c3d63;}
+  .list-empty{color:var(--muted2);font-size:13px;padding:32px;text-align:center;border:1px dashed var(--border2);border-radius:12px;}
+
+  .toggle-pill{font-size:11px;padding:4px 10px;border-radius:999px;border:1px solid var(--border2);color:var(--muted);background:transparent;}
+  .toggle-pill.on{border-color:var(--emerald-bd);color:#6ee7b7;background:var(--emerald-soft);}
+
+  .bar-track{height:10px;background:var(--panel2);border-radius:999px;overflow:hidden;}
+  .bar-fill{height:100%;background:var(--amber);}
+
+  .section-head{display:flex;align-items:center;gap:10px;margin-bottom:18px;}
+  .section-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;}
+  .section-title{font-size:17px;font-weight:600;color:#f1f5f9;}
+  .count-pill{font-size:11px;color:var(--muted2);background:var(--panel);border:1px solid var(--border);padding:2px 9px;border-radius:999px;}
+
+  .edit-panel{background:var(--panel2);border:1px solid var(--amber-bd);border-radius:14px;padding:14px;margin-bottom:14px;}
+  .health-row{display:flex;align-items:center;justify-content:space-between;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:8px;}
+  .health-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+
+  .chat-box{background:var(--panel);border:1px solid var(--border);border-radius:16px;display:flex;flex-direction:column;height:60vh;overflow:hidden;}
+  .calc-layout{display:flex;gap:16px;align-items:flex-start;}
+  .calc-list{width:250px;flex-shrink:0;}
+  @media (max-width:820px){.calc-layout{flex-direction:column;}.calc-list{width:100%;}}
+  .chat-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;}
+  .msg{max-width:80%;border-radius:12px;padding:9px 13px;font-size:13px;line-height:1.5;}
+  .msg.user{align-self:flex-end;background:var(--amber-soft);border:1px solid var(--amber-bd);color:#fde68a;}
+  .msg.bot{align-self:flex-start;background:var(--panel2);border:1px solid var(--border2);color:#e2e8f0;}
+  .disclaimer{font-size:11px;color:var(--muted2);padding:8px 14px;border-bottom:1px solid var(--border);background:rgba(251,191,36,.04);}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>const {
+  useState,
+  useEffect,
+  useMemo,
+  useRef
+} = React;
+
+/* ---------------- Storage adapter (Claude bulut depolama + tarayıcı yedeği) ----------------
+   window.storage yalnızca Claude.ai artifact ortamında sağlanır. Dosya indirilip bağımsız
+   açıldığında veya başka bir yerde barındırıldığında bu API mevcut olmayabilir; bu durumda
+   otomatik olarak tarayıcının localStorage'ına düşer ki veri/anahtar kaybı yaşanmasın. */
+const LS_PREFIX = "mig_";
+const LocalStorageAdapter = {
+  async get(key) {
+    const raw = window.localStorage.getItem(LS_PREFIX + key);
+    if (raw === null) throw new Error("not found");
+    return {
+      key,
+      value: raw,
+      shared: false
+    };
+  },
+  async set(key, value) {
+    window.localStorage.setItem(LS_PREFIX + key, value);
+    return {
+      key,
+      value,
+      shared: false
+    };
+  },
+  async delete(key) {
+    window.localStorage.removeItem(LS_PREFIX + key);
+    return {
+      key,
+      deleted: true,
+      shared: false
+    };
+  },
+  async list(prefix) {
+    const keys = Object.keys(window.localStorage).filter(k => k.startsWith(LS_PREFIX + (prefix || ""))).map(k => k.slice(LS_PREFIX.length));
+    return {
+      keys,
+      prefix,
+      shared: false
+    };
+  }
+};
+const hasCloudStorage = typeof window !== "undefined" && window.storage && typeof window.storage.get === "function";
+let hasLocalStorage = false;
+try {
+  window.localStorage.setItem("__mig_test__", "1");
+  window.localStorage.removeItem("__mig_test__");
+  hasLocalStorage = true;
+} catch (e) {
+  hasLocalStorage = false;
+}
+const AppStorage = hasCloudStorage ? window.storage : LocalStorageAdapter;
+const STORAGE_BACKEND = hasCloudStorage ? "cloud" : hasLocalStorage ? "local" : "none";
+
+/* ---------------- Icons (bespoke, dependency-free) ---------------- */
+function Icon({
+  name,
+  size = 16,
+  className = "",
+  style
+}) {
+  const p = {
+    width: size,
+    height: size,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.8,
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    className,
+    style
+  };
+  const paths = {
+    dashboard: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("rect", {
+      x: "3",
+      y: "3",
+      width: "7",
+      height: "9",
+      rx: "1.5"
+    }), /*#__PURE__*/React.createElement("rect", {
+      x: "14",
+      y: "3",
+      width: "7",
+      height: "5",
+      rx: "1.5"
+    }), /*#__PURE__*/React.createElement("rect", {
+      x: "14",
+      y: "12",
+      width: "7",
+      height: "9",
+      rx: "1.5"
+    }), /*#__PURE__*/React.createElement("rect", {
+      x: "3",
+      y: "16",
+      width: "7",
+      height: "5",
+      rx: "1.5"
+    })),
+    tasks: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
+      d: "M4 6h16M4 12h16M4 18h10"
+    }), /*#__PURE__*/React.createElement("circle", {
+      cx: "20",
+      cy: "18",
+      r: "1.6"
+    })),
+    calendar: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("rect", {
+      x: "3",
+      y: "5",
+      width: "18",
+      height: "16",
+      rx: "2"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M3 10h18M8 3v4M16 3v4"
+    })),
+    trending: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
+      d: "M3 17l6-6 4 4 8-8"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M15 7h6v6"
+    })),
+    wallet: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("rect", {
+      x: "3",
+      y: "6",
+      width: "18",
+      height: "13",
+      rx: "2"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M3 10h18"
+    }), /*#__PURE__*/React.createElement("circle", {
+      cx: "17",
+      cy: "14",
+      r: "1.3"
+    })),
+    piggy: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
+      d: "M4 12a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v2a2 2 0 0 1-2 2h-1l-1 3H9l-1-3H7a3 3 0 0 1-3-3z"
+    }), /*#__PURE__*/React.createElement("circle", {
+      cx: "15",
+      cy: "11",
+      r: ".8"
+    })),
+    building: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("rect", {
+      x: "4",
+      y: "3",
+      width: "10",
+      height: "18",
+      rx: "1"
+    }), /*#__PURE__*/React.createElement("rect", {
+      x: "16",
+      y: "9",
+      width: "5",
+      height: "12",
+      rx: "1"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M7 7h1M11 7h1M7 11h1M11 11h1M7 15h1M11 15h1"
+    })),
+    database: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("ellipse", {
+      cx: "12",
+      cy: "5",
+      rx: "8",
+      ry: "3"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"
+    })),
+    chart: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
+      d: "M4 20V10M11 20V4M18 20v-7"
+    })),
+    users: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("circle", {
+      cx: "9",
+      cy: "8",
+      r: "3.2"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"
+    }), /*#__PURE__*/React.createElement("circle", {
+      cx: "18",
+      cy: "9",
+      r: "2.6"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M15.5 14.3c2.6.5 4.5 2.6 4.5 5.7"
+    })),
+    folder: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
+      d: "M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
+    })),
+    calc: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("rect", {
+      x: "4",
+      y: "2",
+      width: "16",
+      height: "20",
+      rx: "2"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M8 7h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 19h.01M12 19h.01M16 19h.01"
+    })),
+    bot: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("rect", {
+      x: "4",
+      y: "8",
+      width: "16",
+      height: "12",
+      rx: "2"
+    }), /*#__PURE__*/React.createElement("circle", {
+      cx: "9",
+      cy: "14",
+      r: "1.2"
+    }), /*#__PURE__*/React.createElement("circle", {
+      cx: "15",
+      cy: "14",
+      r: "1.2"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M12 8V4M9 4h6"
+    })),
+    plus: /*#__PURE__*/React.createElement("path", {
+      d: "M12 5v14M5 12h14"
+    }),
+    trash: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
+      d: "M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"
+    })),
+    x: /*#__PURE__*/React.createElement("path", {
+      d: "M18 6 6 18M6 6l12 12"
+    }),
+    chevron: /*#__PURE__*/React.createElement("path", {
+      d: "M9 6l6 6-6 6"
+    }),
+    search: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("circle", {
+      cx: "11",
+      cy: "11",
+      r: "7"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M20 20l-3.5-3.5"
+    })),
+    alert: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
+      d: "M12 3l10 18H2z"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M12 10v4M12 17h.01"
+    })),
+    eye: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
+      d: "M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"
+    }), /*#__PURE__*/React.createElement("circle", {
+      cx: "12",
+      cy: "12",
+      r: "3"
+    })),
+    eyeOff: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
+      d: "M3 3l18 18"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M10.6 5.2A10.6 10.6 0 0 1 12 5c6.5 0 10 7 10 7a15.6 15.6 0 0 1-3.4 4.3M6.3 6.4C3.7 8 2 12 2 12s3.5 7 10 7c1.3 0 2.5-.2 3.6-.6"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M9.9 9.9a3 3 0 0 0 4.2 4.2"
+    })),
+    pencil: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
+      d: "M12 20h9"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"
+    })),
+    save: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
+      d: "M5 3h11l3 3v15H5z"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M8 3v6h8V3M8 21v-7h8v7"
+    })),
+    dollar: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
+      d: "M12 2v20"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M17 6.5c0-1.9-2.2-3.5-5-3.5S7 4.6 7 6.5 9.2 9.5 12 9.5s5 1.5 5 3.5-2.2 3.5-5 3.5-5-1.6-5-3.5"
+    })),
+    coins: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("ellipse", {
+      cx: "9",
+      cy: "8",
+      rx: "6",
+      ry: "3.2"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M3 8v4c0 1.8 2.7 3.2 6 3.2s6-1.4 6-3.2V8"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M3 12v4c0 1.8 2.7 3.2 6 3.2 1 0 2-.1 2.8-.4"
+    }), /*#__PURE__*/React.createElement("ellipse", {
+      cx: "17",
+      cy: "13.5",
+      rx: "4.2",
+      ry: "2.3"
+    })),
+    megaphone: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
+      d: "M3 10v4h3l6 4V6l-6 4z"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M14 9a3 3 0 0 1 0 6"
+    })),
+    refresh: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
+      d: "M4 4v5h5"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M20 20v-5h-5"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M4 9a8 8 0 0 1 14.5-3.5M20 15a8 8 0 0 1-14.5 3.5"
+    })),
+    send: /*#__PURE__*/React.createElement("path", {
+      d: "M22 2 11 13M22 2l-7 20-4-9-9-4z"
+    }),
+    key: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("circle", {
+      cx: "7.5",
+      cy: "15.5",
+      r: "4.5"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M10.6 12.4 20 3M17 6l3 3M14 9l2.5 2.5"
+    })),
+    loader: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("path", {
+      d: "M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"
+    })),
+    pulse: /*#__PURE__*/React.createElement("path", {
+      d: "M3 12h4l2-7 4 14 2-7h6"
+    }),
+    menu: /*#__PURE__*/React.createElement("path", {
+      d: "M4 6h16M4 12h16M4 18h16"
+    }),
+    check: /*#__PURE__*/React.createElement("path", {
+      d: "M20 6 9 17l-5-5"
+    })
+  };
+  return /*#__PURE__*/React.createElement("svg", p, paths[name] || null);
+}
+
+/* ---------------- Config ---------------- */
+const APP_NAME = "Murat İyicioğlu";
+const APP_SUB = "Gayrimenkul";
+const STORAGE_KEY = "muratIyiciogluGayrimenkulData";
+const EMPTY = {
+  tasks: [],
+  appointments: [],
+  income: [],
+  expenses: [],
+  bankAssets: [],
+  portfolio: [],
+  siteData: [],
+  contacts: [],
+  documents: [],
+  sectorEvents: [],
+  rates: {
+    usd: 47.6,
+    usdChange: 0.09,
+    eur: 55.05,
+    eurChange: 0.05,
+    goldOns: 4268.17,
+    goldOnsChange: 0.5,
+    goldGram: 6532.31,
+    goldGramChange: 0.5,
+    ataAltin: 44097,
+    ataAltinChange: 0.03,
+    updatedAt: ""
+  },
+  marketStats: {
+    region: "Bölgem",
+    forSaleCount: 0,
+    forRentCount: 0,
+    avgSalePrice: 0,
+    avgOtherPrice: 0
+  },
+  socialPlan: {
+    activeAccounts: 3,
+    totalContent: 5,
+    doneContent: 0
+  },
+  automationRules: {
+    paymentReminderEnabled: true,
+    paymentReminderDays: 3
+  },
+  careerGoals: {
+    period30day: "",
+    period60day: "",
+    period90day: "",
+    targetIncome: 0,
+    targetClosures: 0
+  },
+  contentOutbox: [],
+  customerMatches: []
+};
+const money = n => new Intl.NumberFormat("tr-TR", {
+  style: "currency",
+  currency: "TRY",
+  maximumFractionDigits: 0
+}).format(Number(n) || 0);
+const todayISO = () => new Date().toISOString().slice(0, 10);
+const uid = () => Math.random().toString(36).slice(2, 10);
+
+// PDF çıktılarında Türkçe karakter + ₺ desteği için gömülü, alt kümelenmiş DejaVu Sans fontu (17KB).
+const TR_FONT_BASE64 = "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AAAAAP+3AAAAAAAAAAD/mgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/9wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/7cAAAAA/9wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/KQAAAAD/3AAA/5AAAAAAAAAAAP+QAAAAAP9h/8kAAP+3AAD/twAA/9wAAAAA/5oAAAAAAAAAAAAA/5oAAAAAAAD/mgAAAAAAAP9r/5D/mv+aAAAAAP/cAAAAAAAvAAAAAAAAAAAAAAAA/7cAAAAA/ub/mv8f/0QAAP7wAAAAAAAAAAD/3AAAAAAAAAAAAAD/3AAAAAAAAP/cAAAAAAAA/0QAAP/c/9wAAAAAADn/rf/c/9wAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/9wAAP99/5AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/0/7BAAD/fQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/0wAA/6QAAAAA/7cAAAAA/9MAAP/c/7f/3P/cAAD/3AAAAAAAAAAAAAD/t//cAAAAAAA5AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/63/t//B/60AAP+aAAAAAAAAAAAAAAAAAAD/awAA/5D/rQAA/30AAP/TAAAAAP+kAAAAAAAAAAAAAP+kAAAAAAAA/6QAAAAAAAD/kP+a/6T/pAAAAAAAAAAAAAAAJgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP9E/w3/H/9hAAD/iAAAAAAAAAAAAAAAAAAA/9wAAAAAAAAAAAAAAAD+rf6kAAD+pAAAAAD/wQAAAAD+pP7T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";
+async function fetchLiveRates(prevRates) {
+  const [usdRes, eurRes, goldRes] = await Promise.all([fetch("https://api.frankfurter.dev/v1/latest?from=USD&to=TRY").then(r => r.json()), fetch("https://api.frankfurter.dev/v1/latest?from=EUR&to=TRY").then(r => r.json()), fetch("https://api.gold-api.com/price/XAU").then(r => r.json())]);
+  const usd = usdRes.rates.TRY;
+  const eur = eurRes.rates.TRY;
+  const goldOns = goldRes.price;
+  const goldGram = goldOns / 31.1035 * usd;
+  const ataAltin = goldGram * 7.216;
+  const pct = (n, o) => o ? Number(((n - o) / o * 100).toFixed(2)) : 0;
+  return {
+    usd,
+    usdChange: pct(usd, prevRates.usd),
+    eur,
+    eurChange: pct(eur, prevRates.eur),
+    goldOns,
+    goldOnsChange: pct(goldOns, prevRates.goldOns),
+    goldGram,
+    goldGramChange: pct(goldGram, prevRates.goldGram),
+    ataAltin,
+    ataAltinChange: pct(ataAltin, prevRates.ataAltin),
+    updatedAt: new Date().toISOString()
+  };
+}
+
+/* ---------------- Section field configs ---------------- */
+const SECTIONS = {
+  tasks: {
+    label: "Görevler",
+    icon: "tasks",
+    accent: "gold",
+    fields: [{
+      key: "title",
+      label: "Görev",
+      type: "text",
+      required: true
+    }, {
+      key: "dueDate",
+      label: "Son Tarih",
+      type: "date"
+    }, {
+      key: "priority",
+      label: "Öncelik",
+      type: "select",
+      options: ["Düşük", "Orta", "Yüksek"]
+    }],
+    toggle: {
+      key: "completed",
+      onLabel: "Tamamlandı",
+      offLabel: "Bekliyor"
+    }
+  },
+  appointments: {
+    label: "Randevular",
+    icon: "calendar",
+    accent: "teal",
+    fields: [{
+      key: "title",
+      label: "Başlık",
+      type: "text",
+      required: true
+    }, {
+      key: "date",
+      label: "Tarih",
+      type: "date",
+      required: true
+    }, {
+      key: "time",
+      label: "Saat",
+      type: "time"
+    }, {
+      key: "location",
+      label: "Yer",
+      type: "text"
+    }]
+  },
+  income: {
+    label: "Gelir Yönetimi",
+    icon: "trending",
+    accent: "teal",
+    fields: [{
+      key: "description",
+      label: "Açıklama",
+      type: "text",
+      required: true
+    }, {
+      key: "amount",
+      label: "Tutar (₺)",
+      type: "number",
+      required: true
+    }, {
+      key: "date",
+      label: "Tarih",
+      type: "date"
+    }, {
+      key: "category",
+      label: "Kategori",
+      type: "select",
+      options: ["Kira", "Satış", "Danışmanlık", "Diğer"]
+    }]
+  },
+  expenses: {
+    label: "Gider & Ödemeler",
+    icon: "wallet",
+    accent: "rose",
+    fields: [{
+      key: "description",
+      label: "Açıklama",
+      type: "text",
+      required: true
+    }, {
+      key: "amount",
+      label: "Tutar (₺)",
+      type: "number",
+      required: true
+    }, {
+      key: "dueDate",
+      label: "Vade Tarihi",
+      type: "date"
+    }, {
+      key: "category",
+      label: "Kategori",
+      type: "select",
+      options: ["Kart", "Fatura", "Kira", "Diğer"]
+    }],
+    toggle: {
+      key: "paid",
+      onLabel: "Ödendi",
+      offLabel: "Bekliyor"
+    }
+  },
+  bankAssets: {
+    label: "Banka & Varlıklar",
+    icon: "piggy",
+    accent: "gold",
+    fields: [{
+      key: "name",
+      label: "Ad",
+      type: "text",
+      required: true
+    }, {
+      key: "type",
+      label: "Tür",
+      type: "select",
+      options: ["Banka Hesabı", "Nakit", "Döviz", "Altın", "Diğer"]
+    }, {
+      key: "balance",
+      label: "Bakiye (₺)",
+      type: "number",
+      required: true
+    }]
+  },
+  portfolio: {
+    label: "Portföy & Potansiyel",
+    icon: "building",
+    accent: "gold",
+    fields: [{
+      key: "title",
+      label: "İlan Başlığı",
+      type: "text",
+      required: true
+    }, {
+      key: "type",
+      label: "Tür",
+      type: "select",
+      options: ["Satılık", "Kiralık"]
+    }, {
+      key: "price",
+      label: "Fiyat (₺)",
+      type: "number"
+    }, {
+      key: "status",
+      label: "Durum",
+      type: "select",
+      options: ["Aktif", "Beklemede", "Satıldı"]
+    }, {
+      key: "location",
+      label: "Konum",
+      type: "text"
+    }]
+  },
+  siteData: {
+    label: "Site Dataları",
+    icon: "database",
+    accent: "teal",
+    fields: [{
+      key: "siteName",
+      label: "Site Adı",
+      type: "text",
+      required: true
+    }, {
+      key: "unitCount",
+      label: "Konut Adedi",
+      type: "number"
+    }, {
+      key: "avgPrice",
+      label: "Ortalama Fiyat (₺)",
+      type: "number"
+    }, {
+      key: "region",
+      label: "Bölge",
+      type: "text"
+    }]
+  },
+  contacts: {
+    label: "Müşteri & Danışman",
+    icon: "users",
+    accent: "rose",
+    fields: [{
+      key: "name",
+      label: "Ad Soyad",
+      type: "text",
+      required: true
+    }, {
+      key: "role",
+      label: "Tür",
+      type: "select",
+      options: ["Müşteri", "Danışman", "Tedarikçi", "Diğer"]
+    }, {
+      key: "phone",
+      label: "Telefon",
+      type: "text"
+    }, {
+      key: "notes",
+      label: "Not",
+      type: "text"
+    }]
+  },
+  documents: {
+    label: "Ofis & Evrak",
+    icon: "folder",
+    accent: "gold",
+    fields: [{
+      key: "title",
+      label: "Belge Adı",
+      type: "text",
+      required: true
+    }, {
+      key: "category",
+      label: "Kategori",
+      type: "select",
+      options: ["Sözleşme", "Fatura", "Evrak", "Diğer"]
+    }, {
+      key: "date",
+      label: "Tarih",
+      type: "date"
+    }, {
+      key: "note",
+      label: "Not",
+      type: "text"
+    }]
+  },
+  sectorEvents: {
+    label: "Sektör Takvimi",
+    icon: "calendar",
+    accent: "teal",
+    fields: [{
+      key: "title",
+      label: "Etkinlik / Tarih Başlığı",
+      type: "text",
+      required: true
+    }, {
+      key: "date",
+      label: "Tarih",
+      type: "date",
+      required: true
+    }, {
+      key: "category",
+      label: "Tür",
+      type: "select",
+      options: ["Yasal Değişiklik", "Vergi/Beyan Tarihi", "Fuar/Etkinlik", "Kişisel Hatırlatma", "Diğer"]
+    }, {
+      key: "note",
+      label: "Not",
+      type: "text"
+    }]
+  }
+};
+const NAV_GROUPS = [{
+  title: "GENEL",
+  items: [{
+    key: "dashboard",
+    label: "Panel",
+    icon: "dashboard"
+  }, {
+    key: "tasks",
+    label: "Görevler",
+    icon: "tasks"
+  }, {
+    key: "appointments",
+    label: "Randevular",
+    icon: "calendar"
+  }]
+}, {
+  title: "FİNANS",
+  items: [{
+    key: "income",
+    label: "Gelir Yönetimi",
+    icon: "trending"
+  }, {
+    key: "expenses",
+    label: "Gider & Ödemeler",
+    icon: "wallet"
+  }, {
+    key: "bankAssets",
+    label: "Banka & Varlıklar",
+    icon: "piggy"
+  }]
+}, {
+  title: "PORTFÖY & PAZAR",
+  items: [{
+    key: "portfolio",
+    label: "Portföy & Potansiyel",
+    icon: "building"
+  }, {
+    key: "siteData",
+    label: "Site Dataları",
+    icon: "database"
+  }, {
+    key: "hotPortfolio",
+    label: "Sıcak Portföy Yakalama",
+    icon: "zap"
+  }]
+}, {
+  title: "ANALİZ & ARAÇLAR",
+  items: [{
+    key: "marketSupply",
+    label: "Piyasa Arz Analizi",
+    icon: "coins"
+  }, {
+    key: "marketPortfolio",
+    label: "Gayrimenkul Piyasa Analizi",
+    icon: "chart"
+  }, {
+    key: "commissionForecast",
+    label: "Komisyon Tahmini",
+    icon: "trending"
+  }, {
+    key: "sectorEvents",
+    label: "Sektör Takvimi",
+    icon: "calendar"
+  }, {
+    key: "gazette",
+    label: "Resmî Gazete Takibi",
+    icon: "folder"
+  }, {
+    key: "contentStudio",
+    label: "İçerik Stüdyosu",
+    icon: "edit"
+  }, {
+    key: "ai",
+    label: "Emlak AI Tools",
+    icon: "bot"
+  }, {
+    key: "search",
+    label: "Akıllı Arama",
+    icon: "search"
+  }, {
+    key: "automation",
+    label: "Otomasyon Kuralları",
+    icon: "refresh"
+  }, {
+    key: "performance",
+    label: "İş & Performans Raporları",
+    icon: "trending"
+  }]
+}, {
+  title: "MÜŞTERİ & EKİP",
+  items: [{
+    key: "contacts",
+    label: "Müşteri & Danışman",
+    icon: "users"
+  }, {
+    key: "documents",
+    label: "Ofis & Evrak",
+    icon: "folder"
+  }]
+}, {
+  title: "KARİYER & GELİŞİM",
+  items: [{
+    key: "career",
+    label: "30-60-90 Hedef Planlama",
+    icon: "target"
+  }, {
+    key: "calc",
+    label: "Hesaplama Araçları",
+    icon: "calc"
+  }]
+}, {
+  title: "ARAÇLAR",
+  items: [{
+    key: "health",
+    label: "Sistem Sağlığı",
+    icon: "pulse"
+  }]
+}];
+const ACCENT = {
+  gold: {
+    color: "#fcd34d",
+    bg: "var(--amber-soft)",
+    bd: "var(--amber-bd)"
+  },
+  teal: {
+    color: "#6ee7b7",
+    bg: "var(--emerald-soft)",
+    bd: "var(--emerald-bd)"
+  },
+  rose: {
+    color: "#fda4af",
+    bg: "var(--rose-soft)",
+    bd: "var(--rose-bd)"
+  }
+};
+function SectionHeader({
+  icon,
+  title,
+  accent,
+  count
+}) {
+  const a = ACCENT[accent];
+  return /*#__PURE__*/React.createElement("div", {
+    className: "section-head"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "section-icon",
+    style: {
+      background: a.bg,
+      border: `1px solid ${a.bd}`,
+      color: a.color
+    }
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: icon,
+    size: 16
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "section-title"
+  }, title), typeof count === "number" && /*#__PURE__*/React.createElement("span", {
+    className: "count-pill"
+  }, count, " kayıt"));
+}
+function Field({
+  f,
+  value,
+  onChange
+}) {
+  if (f.type === "select") {
+    return /*#__PURE__*/React.createElement("select", {
+      className: "select",
+      value: value || "",
+      onChange: e => onChange(e.target.value)
+    }, /*#__PURE__*/React.createElement("option", {
+      value: ""
+    }, "Seçiniz"), f.options.map(o => /*#__PURE__*/React.createElement("option", {
+      key: o,
+      value: o
+    }, o)));
+  }
+  return /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    type: f.type,
+    value: value || "",
+    placeholder: f.label,
+    onChange: e => onChange(e.target.value)
+  });
+}
+function CrudSection({
+  sectionKey,
+  data,
+  onAdd,
+  onDelete,
+  onToggle
+}) {
+  const cfg = SECTIONS[sectionKey];
+  const [form, setForm] = useState({});
+  const [query, setQuery] = useState("");
+  const [error, setError] = useState("");
+  const filtered = useMemo(() => {
+    if (!query.trim()) return data;
+    const q = query.toLowerCase();
+    return data.filter(row => Object.values(row).join(" ").toLowerCase().includes(q));
+  }, [data, query]);
+  const submit = () => {
+    const missing = cfg.fields.filter(f => f.required && !form[f.key]);
+    if (missing.length) {
+      setError(`${missing.map(m => m.label).join(", ")} zorunlu`);
+      return;
+    }
+    setError("");
+    onAdd(cfg.toggle ? {
+      id: uid(),
+      ...form,
+      [cfg.toggle.key]: false
+    } : {
+      id: uid(),
+      ...form
+    });
+    setForm({});
+  };
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(SectionHeader, {
+    icon: cfg.icon,
+    title: cfg.label,
+    accent: cfg.accent,
+    count: data.length
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      marginBottom: 20
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-4"
+  }, cfg.fields.map(f => /*#__PURE__*/React.createElement(Field, {
+    key: f.key,
+    f: f,
+    value: form[f.key],
+    onChange: v => setForm(s => ({
+      ...s,
+      [f.key]: v
+    }))
+  }))), error && /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: "#fb7185",
+      fontSize: 12,
+      marginTop: 8
+    }
+  }, error), /*#__PURE__*/React.createElement("button", {
+    className: "btn",
+    style: {
+      marginTop: 12
+    },
+    onClick: submit
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "plus",
+    size: 14
+  }), " Ekle")), /*#__PURE__*/React.createElement("div", {
+    className: "row gap-2",
+    style: {
+      marginBottom: 12
+    }
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "search",
+    size: 14,
+    className: "",
+    style: {
+      color: "#64748b"
+    }
+  }), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    style: {
+      maxWidth: 260,
+      background: "transparent",
+      border: "none",
+      borderBottom: "1px solid var(--border2)",
+      borderRadius: 0,
+      padding: "6px 2px"
+    },
+    placeholder: "Ara...",
+    value: query,
+    onChange: e => setQuery(e.target.value)
+  })), filtered.length === 0 && /*#__PURE__*/React.createElement("div", {
+    className: "list-empty"
+  }, "Henüz kayıt yok. Yukarıdan ekleyebilirsin."), filtered.map(row => /*#__PURE__*/React.createElement("div", {
+    key: row.id,
+    className: "list-row"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row wrap gap-3",
+    style: {
+      fontSize: 13
+    }
+  }, cfg.fields.map(f => {
+    const val = row[f.key];
+    if (!val) return null;
+    const display = f.type === "number" ? money(val) : val;
+    return /*#__PURE__*/React.createElement("span", {
+      key: f.key,
+      style: f.key === cfg.fields[0].key ? {
+        color: "#f1f5f9",
+        fontWeight: 500
+      } : {
+        color: "#94a3b8"
+      }
+    }, display);
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "row gap-2"
+  }, cfg.toggle && /*#__PURE__*/React.createElement("button", {
+    className: `toggle-pill ${row[cfg.toggle.key] ? "on" : ""}`,
+    onClick: () => onToggle(row.id)
+  }, row[cfg.toggle.key] ? cfg.toggle.onLabel : cfg.toggle.offLabel), /*#__PURE__*/React.createElement("button", {
+    className: "btn-icon",
+    onClick: () => onDelete(row.id)
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "trash",
+    size: 15
+  }))))));
+}
+function StatCard({
+  label,
+  value,
+  sub,
+  accent
+}) {
+  const a = ACCENT[accent];
+  return /*#__PURE__*/React.createElement("div", {
+    className: "stat"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "stat-label",
+    style: {
+      color: a.color
+    }
+  }, label), /*#__PURE__*/React.createElement("div", {
+    className: "stat-value"
+  }, value), sub && /*#__PURE__*/React.createElement("div", {
+    className: "stat-sub"
+  }, sub));
+}
+function RateCard({
+  label,
+  value,
+  change,
+  unit,
+  hidden
+}) {
+  const up = Number(change) >= 0;
+  return /*#__PURE__*/React.createElement("div", {
+    className: "rate-card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "rate-label"
+  }, label), /*#__PURE__*/React.createElement("div", {
+    className: `rate-value ${hidden ? "blurred" : ""}`
+  }, unit || "", Number(value).toLocaleString("tr-TR", {
+    maximumFractionDigits: 2
+  })), /*#__PURE__*/React.createElement("div", {
+    className: `rate-change ${up ? "up" : "down"}`
+  }, up ? "▲" : "▼", " ", Math.abs(Number(change) || 0), "%"));
+}
+function EditPanel({
+  title,
+  fields,
+  values,
+  onSave,
+  onClose
+}) {
+  const [draft, setDraft] = useState(values);
+  return /*#__PURE__*/React.createElement("div", {
+    className: "edit-panel"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row between",
+    style: {
+      marginBottom: 10
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600,
+      color: "#fcd34d"
+    }
+  }, title, " — Düzenle"), /*#__PURE__*/React.createElement("button", {
+    className: "btn-icon",
+    onClick: onClose
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "x",
+    size: 15
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-3"
+  }, fields.map(f => /*#__PURE__*/React.createElement("div", {
+    key: f.key
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "label"
+  }, f.label), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    type: f.type || "number",
+    value: draft[f.key] ?? "",
+    onChange: e => setDraft(d => ({
+      ...d,
+      [f.key]: f.type === "text" ? e.target.value : Number(e.target.value)
+    }))
+  })))), /*#__PURE__*/React.createElement("button", {
+    className: "btn",
+    style: {
+      marginTop: 10,
+      fontSize: 12
+    },
+    onClick: () => onSave(draft)
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "save",
+    size: 13
+  }), " Kaydet"));
+}
+function Dashboard({
+  appData,
+  setPage,
+  persist
+}) {
+  const [hideNumbers, setHideNumbers] = useState(false);
+  const [editRates, setEditRates] = useState(false);
+  const [editMarket, setEditMarket] = useState(false);
+  const [editSocial, setEditSocial] = useState(false);
+  const [ratesLoading, setRatesLoading] = useState(false);
+  const [ratesError, setRatesError] = useState("");
+  const autoFetchedRef = useRef(false);
+  const rates = appData.rates;
+  const refreshRates = async () => {
+    setRatesLoading(true);
+    setRatesError("");
+    try {
+      const fresh = await fetchLiveRates(rates);
+      persist({
+        ...appData,
+        rates: fresh
+      });
+    } catch (e) {
+      setRatesError("Otomatik güncelleme başarısız — bağlantı sorunu olabilir, elle girebilirsin.");
+    } finally {
+      setRatesLoading(false);
+    }
+  };
+  useEffect(() => {
+    const stale = !rates.updatedAt || Date.now() - new Date(rates.updatedAt).getTime() > 1000 * 60 * 30;
+    if (stale && !autoFetchedRef.current) {
+      autoFetchedRef.current = true;
+      refreshRates();
+    }
+  }, []);
+  const openTasks = appData.tasks.filter(t => !t.completed).length;
+  const upcomingAppt = appData.appointments.length;
+  const totalIncome = appData.income.reduce((s, i) => s + (Number(i.amount) || 0), 0);
+  const totalExpense = appData.expenses.reduce((s, e) => s + (Number(e.amount) || 0), 0);
+  const net = totalIncome - totalExpense;
+  const today = todayISO();
+  const dueToday = appData.expenses.filter(e => !e.paid && e.dueDate === today);
+  const unpaid = appData.expenses.filter(e => !e.paid);
+  const market = appData.marketStats;
+  const social = appData.socialPlan;
+  const socialPct = social.totalContent > 0 ? Math.round(social.doneContent / social.totalContent * 100) : 0;
+  const saveRates = draft => {
+    persist({
+      ...appData,
+      rates: {
+        ...draft,
+        updatedAt: new Date().toISOString()
+      }
+    });
+    setEditRates(false);
+  };
+  const saveMarket = draft => {
+    persist({
+      ...appData,
+      marketStats: draft
+    });
+    setEditMarket(false);
+  };
+  const saveSocial = draft => {
+    persist({
+      ...appData,
+      socialPlan: draft
+    });
+    setEditSocial(false);
+  };
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "row between wrap gap-3",
+    style: {
+      marginBottom: 24
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "eyebrow"
+  }, APP_NAME, " · ", APP_SUB), /*#__PURE__*/React.createElement("h1", {
+    className: "h1"
+  }, "Panel")), /*#__PURE__*/React.createElement("div", {
+    className: "row gap-2 wrap"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row gap-2",
+    style: {
+      background: "var(--panel)",
+      border: "1px solid var(--border)",
+      borderRadius: 10,
+      padding: "7px 12px"
+    }
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "search",
+    size: 14,
+    style: {
+      color: "#64748b"
+    }
+  }), /*#__PURE__*/React.createElement("input", {
+    placeholder: "Her yerde ara...",
+    style: {
+      background: "transparent",
+      border: "none",
+      outline: "none",
+      color: "#cbd5e1",
+      fontSize: 13,
+      width: 140
+    }
+  })), /*#__PURE__*/React.createElement("button", {
+    className: "btn-ghost",
+    style: {
+      display: "inline-flex",
+      alignItems: "center",
+      gap: 6,
+      fontSize: 12,
+      padding: "7px 12px",
+      borderRadius: 10
+    },
+    onClick: () => setHideNumbers(h => !h)
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: hideNumbers ? "eye" : "eyeOff",
+    size: 13
+  }), " ", hideNumbers ? "Rakamları Göster" : "Rakamları Gizle"), /*#__PURE__*/React.createElement("span", {
+    className: "badge badge-ok"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "badge-dot"
+  }), "Sistem Aktif"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 12,
+      color: "#64748b"
+    }
+  }, new Date().toLocaleDateString("tr-TR")))), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-2",
+    style: {
+      marginBottom: 20
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "card",
+    style: {
+      textAlign: "left",
+      border: "1px solid var(--border)"
+    },
+    onClick: () => setPage("tasks")
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row between"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "eyebrow",
+    style: {
+      marginBottom: 4
+    }
+  }, "Hızlı Erişim"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      color: "#cbd5e1"
+    }
+  }, "Görevler")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 30,
+      fontWeight: 600
+    }
+  }, openTasks)), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: "#64748b",
+      marginTop: 4
+    }
+  }, "açık")), /*#__PURE__*/React.createElement("button", {
+    className: "card",
+    style: {
+      textAlign: "left",
+      border: "1px solid var(--border)"
+    },
+    onClick: () => setPage("appointments")
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row between"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "eyebrow",
+    style: {
+      color: "#6ee7b7",
+      marginBottom: 4
+    }
+  }, "Hızlı Erişim"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      color: "#cbd5e1"
+    }
+  }, "Randevular")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 30,
+      fontWeight: 600
+    }
+  }, upcomingAppt)), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: "#64748b",
+      marginTop: 4
+    }
+  }, "aktif"))), dueToday.length > 0 && /*#__PURE__*/React.createElement("div", {
+    className: "alert",
+    onClick: () => setPage("expenses")
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "alert",
+    size: 18,
+    style: {
+      color: "#fda4af",
+      flexShrink: 0
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "alert-text"
+  }, /*#__PURE__*/React.createElement("b", null, "Kart Ödeme Alarmı"), " — bugün son ödeme günü olan ", dueToday.length, " ödeme var"), /*#__PURE__*/React.createElement(Icon, {
+    name: "chevron",
+    size: 16,
+    style: {
+      color: "#fda4af",
+      marginLeft: "auto"
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      marginBottom: 20
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row between",
+    style: {
+      marginBottom: 4
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row gap-2"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "dollar",
+    size: 15,
+    style: {
+      color: "#fcd34d"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600
+    }
+  }, "Güncel Piyasalar — Döviz ve Altın")), /*#__PURE__*/React.createElement("div", {
+    className: "row gap-2"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn-ghost",
+    style: {
+      display: "inline-flex",
+      alignItems: "center",
+      gap: 5,
+      fontSize: 11,
+      padding: "5px 10px",
+      borderRadius: 8
+    },
+    onClick: refreshRates,
+    disabled: ratesLoading
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "refresh",
+    size: 13,
+    style: ratesLoading ? {
+      animation: "spin 1s linear infinite"
+    } : {}
+  }), " ", ratesLoading ? "Güncelleniyor" : "Yenile"), /*#__PURE__*/React.createElement("button", {
+    className: "btn-icon",
+    onClick: () => setEditRates(v => !v)
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "pencil",
+    size: 14
+  })))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: ratesError ? "#fb7185" : "#64748b",
+      marginBottom: 12
+    }
+  }, ratesError || (rates.updatedAt ? `Otomatik güncellendi: ${new Date(rates.updatedAt).toLocaleString("tr-TR")} · Kaynak: Frankfurter & Gold-API` : "Güncelleniyor...")), editRates && /*#__PURE__*/React.createElement(EditPanel, {
+    title: "Döviz ve Altın",
+    values: rates,
+    onClose: () => setEditRates(false),
+    onSave: saveRates,
+    fields: [{
+      key: "usd",
+      label: "Dolar (₺)"
+    }, {
+      key: "usdChange",
+      label: "Dolar % Değişim"
+    }, {
+      key: "eur",
+      label: "Euro (₺)"
+    }, {
+      key: "eurChange",
+      label: "Euro % Değişim"
+    }, {
+      key: "goldOns",
+      label: "Altın Ons ($)"
+    }, {
+      key: "goldOnsChange",
+      label: "Ons % Değişim"
+    }, {
+      key: "goldGram",
+      label: "Altın Gram (₺)"
+    }, {
+      key: "goldGramChange",
+      label: "Gram % Değişim"
+    }, {
+      key: "ataAltin",
+      label: "Ata Altın (₺)"
+    }, {
+      key: "ataAltinChange",
+      label: "Ata % Değişim"
+    }]
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "row wrap gap-3"
+  }, /*#__PURE__*/React.createElement(RateCard, {
+    label: "Dolar",
+    value: rates.usd,
+    change: rates.usdChange,
+    unit: "₺",
+    hidden: hideNumbers
+  }), /*#__PURE__*/React.createElement(RateCard, {
+    label: "Euro",
+    value: rates.eur,
+    change: rates.eurChange,
+    unit: "₺",
+    hidden: hideNumbers
+  }), /*#__PURE__*/React.createElement(RateCard, {
+    label: "Altın (Ons)",
+    value: rates.goldOns,
+    change: rates.goldOnsChange,
+    unit: "$",
+    hidden: hideNumbers
+  }), /*#__PURE__*/React.createElement(RateCard, {
+    label: "Altın Gram",
+    value: rates.goldGram,
+    change: rates.goldGramChange,
+    unit: "₺",
+    hidden: hideNumbers
+  }), /*#__PURE__*/React.createElement(RateCard, {
+    label: "Ata Altın",
+    value: rates.ataAltin,
+    change: rates.ataAltinChange,
+    unit: "₺",
+    hidden: hideNumbers
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      marginBottom: 20
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row between",
+    style: {
+      marginBottom: 12
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row gap-2"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "coins",
+    size: 15,
+    style: {
+      color: "#6ee7b7"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600
+    }
+  }, "Piyasa Arz Hafızası — ", market.region, " Arz ve Site Fiyatları")), /*#__PURE__*/React.createElement("button", {
+    className: "btn-icon",
+    onClick: () => setEditMarket(v => !v)
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "pencil",
+    size: 14
+  }))), editMarket && /*#__PURE__*/React.createElement(EditPanel, {
+    title: "Piyasa Arz Hafızası",
+    values: market,
+    onClose: () => setEditMarket(false),
+    onSave: saveMarket,
+    fields: [{
+      key: "region",
+      label: "Bölge Adı",
+      type: "text"
+    }, {
+      key: "forSaleCount",
+      label: "Satılık Konut İlanı"
+    }, {
+      key: "forRentCount",
+      label: "Kiralık Konut İlanı"
+    }, {
+      key: "avgSalePrice",
+      label: "Ort. Satılık Toplam Site (₺)"
+    }, {
+      key: "avgOtherPrice",
+      label: "Ort. Diğer Site (₺)"
+    }]
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-4"
+  }, /*#__PURE__*/React.createElement(StatCard, {
+    label: "Satılık Konut İlanı",
+    value: hideNumbers ? "•••" : market.forSaleCount,
+    accent: "teal"
+  }), /*#__PURE__*/React.createElement(StatCard, {
+    label: "Kiralık Konut İlanı",
+    value: hideNumbers ? "•••" : market.forRentCount,
+    accent: "rose"
+  }), /*#__PURE__*/React.createElement(StatCard, {
+    label: "Ort. Satılık Toplam Site",
+    value: hideNumbers ? "•••" : money(market.avgSalePrice),
+    accent: "gold"
+  }), /*#__PURE__*/React.createElement(StatCard, {
+    label: "Ort. Diğer Site",
+    value: hideNumbers ? "•••" : money(market.avgOtherPrice),
+    accent: "gold"
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-2",
+    style: {
+      marginBottom: 20
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row between",
+    style: {
+      marginBottom: 10
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row gap-2"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "megaphone",
+    size: 15,
+    style: {
+      color: "#fcd34d"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600
+    }
+  }, "Sosyal Medya Planı")), /*#__PURE__*/React.createElement("button", {
+    className: "btn-icon",
+    onClick: () => setEditSocial(v => !v)
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "pencil",
+    size: 14
+  }))), editSocial && /*#__PURE__*/React.createElement(EditPanel, {
+    title: "Sosyal Medya Planı",
+    values: social,
+    onClose: () => setEditSocial(false),
+    onSave: saveSocial,
+    fields: [{
+      key: "activeAccounts",
+      label: "Aktif Hesap"
+    }, {
+      key: "totalContent",
+      label: "Haftalık Hedef İçerik"
+    }, {
+      key: "doneContent",
+      label: "Tamamlanan İçerik"
+    }]
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: "#94a3b8",
+      marginBottom: 8
+    }
+  }, "Bu haftaki paylaşım hedefleri · ", social.activeAccounts, " aktif hesap · ", Math.max(social.totalContent - social.doneContent, 0), " içerik kaldı"), /*#__PURE__*/React.createElement("div", {
+    className: "bar-track",
+    style: {
+      marginBottom: 8
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bar-fill",
+    style: {
+      width: `${socialPct}%`
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "row between",
+    style: {
+      fontSize: 12
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "#64748b"
+    }
+  }, "%", socialPct, " tamamlandı"), /*#__PURE__*/React.createElement("div", {
+    className: "row gap-2"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "badge badge-ok"
+  }, social.doneContent, " Tamamlandı"), /*#__PURE__*/React.createElement("span", {
+    className: "badge"
+  }, Math.max(social.totalContent - social.doneContent, 0), " Geride")))), /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600,
+      marginBottom: 12
+    }
+  }, "Bugünün Finans ve Operasyon"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row between",
+    style: {
+      marginBottom: 6
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "#94a3b8"
+    }
+  }, "Net Bakiye"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: net >= 0 ? "#6ee7b7" : "#fda4af"
+    }
+  }, hideNumbers ? "•••" : money(net))), /*#__PURE__*/React.createElement("div", {
+    className: "row between",
+    style: {
+      marginBottom: 6
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "#94a3b8"
+    }
+  }, "Toplam Gelir"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "#cbd5e1"
+    }
+  }, hideNumbers ? "•••" : money(totalIncome))), /*#__PURE__*/React.createElement("div", {
+    className: "row between",
+    style: {
+      marginBottom: 6
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "#94a3b8"
+    }
+  }, "Toplam Gider"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "#cbd5e1"
+    }
+  }, hideNumbers ? "•••" : money(totalExpense))), /*#__PURE__*/React.createElement("div", {
+    className: "row between",
+    style: {
+      marginBottom: 6
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "#94a3b8"
+    }
+  }, "Bekleyen Ödemeler"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "#cbd5e1"
+    }
+  }, unpaid.length)), /*#__PURE__*/React.createElement("div", {
+    className: "row between"
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "#94a3b8"
+    }
+  }, "Aktif Portföy"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "#cbd5e1"
+    }
+  }, appData.portfolio.filter(p => p.status === "Aktif").length, " / ", appData.portfolio.length))))), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-2"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600,
+      marginBottom: 10
+    }
+  }, "Yaklaşan Görevler"), appData.tasks.filter(t => !t.completed).slice(0, 5).length === 0 && /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: "#64748b",
+      fontSize: 13
+    }
+  }, "Bekleyen görev yok."), appData.tasks.filter(t => !t.completed).slice(0, 5).map(t => /*#__PURE__*/React.createElement("div", {
+    key: t.id,
+    className: "row between",
+    style: {
+      fontSize: 13,
+      marginBottom: 6
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "#cbd5e1"
+    }
+  }, t.title), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "#64748b"
+    }
+  }, t.dueDate || "-")))), /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600,
+      marginBottom: 10
+    }
+  }, "Yaklaşan Randevular"), appData.appointments.slice(0, 5).length === 0 && /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: "#64748b",
+      fontSize: 13
+    }
+  }, "Kayıtlı randevu yok."), appData.appointments.slice(0, 5).map(a => /*#__PURE__*/React.createElement("div", {
+    key: a.id,
+    className: "row between",
+    style: {
+      fontSize: 13,
+      marginBottom: 6
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "#cbd5e1"
+    }
+  }, a.title), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "#64748b"
+    }
+  }, a.date, " ", a.time))))));
+}
+function MarketSupplyAnalysis({
+  appData
+}) {
+  const market = appData.marketStats;
+  const siteList = appData.siteData;
+  const toplamKonut = siteList.reduce((s, d) => s + (Number(d.unitCount) || 0), 0);
+  const ortalamaSiteFiyati = siteList.length ? siteList.reduce((s, d) => s + (Number(d.avgPrice) || 0), 0) / siteList.length : 0;
+  const maxArz = Math.max(1, market.forSaleCount, market.forRentCount);
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(SectionHeader, {
+    icon: "coins",
+    title: "Piyasa Arz Analizi",
+    accent: "teal"
+  }), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: 12,
+      color: "#64748b",
+      marginBottom: 16
+    }
+  }, "Panel'deki \"Piyasa Arz Hafızası\" kartına ve Site Dataları bölümüne girdiğin verilerden otomatik derlenir."), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-2",
+    style: {
+      marginBottom: 16
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600,
+      marginBottom: 16
+    }
+  }, market.region, " — Satılık / Kiralık İlan Dağılımı"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: 10
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row between",
+    style: {
+      fontSize: 12,
+      color: "#94a3b8",
+      marginBottom: 4
+    }
+  }, /*#__PURE__*/React.createElement("span", null, "Satılık"), /*#__PURE__*/React.createElement("span", null, market.forSaleCount)), /*#__PURE__*/React.createElement("div", {
+    className: "bar-track"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bar-fill",
+    style: {
+      width: `${market.forSaleCount / maxArz * 100}%`,
+      background: "#34d399"
+    }
+  }))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "row between",
+    style: {
+      fontSize: 12,
+      color: "#94a3b8",
+      marginBottom: 4
+    }
+  }, /*#__PURE__*/React.createElement("span", null, "Kiralık"), /*#__PURE__*/React.createElement("span", null, market.forRentCount)), /*#__PURE__*/React.createElement("div", {
+    className: "bar-track"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bar-fill",
+    style: {
+      width: `${market.forRentCount / maxArz * 100}%`,
+      background: "#fda4af"
+    }
+  })))), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-2",
+    style: {
+      gap: 14
+    }
+  }, /*#__PURE__*/React.createElement(StatCard, {
+    label: "Ort. Satılık Toplam Site",
+    value: money(market.avgSalePrice),
+    accent: "gold"
+  }), /*#__PURE__*/React.createElement(StatCard, {
+    label: "Ort. Diğer Site",
+    value: money(market.avgOtherPrice),
+    accent: "gold"
+  }), /*#__PURE__*/React.createElement(StatCard, {
+    label: "Kayıtlı Site Sayısı",
+    value: siteList.length,
+    accent: "teal"
+  }), /*#__PURE__*/React.createElement(StatCard, {
+    label: "Toplam Konut Adedi",
+    value: toplamKonut,
+    accent: "teal"
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600,
+      marginBottom: 6
+    }
+  }, "Site Dataları — Ortalama Fiyat"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 22,
+      fontWeight: 600,
+      color: "#fcd34d"
+    }
+  }, money(ortalamaSiteFiyati)), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: "#64748b",
+      marginTop: 4
+    }
+  }, siteList.length, " kayıtlı site üzerinden ortalama")));
+}
+function PortfolioMarketAnalysis({
+  appData
+}) {
+  const list = appData.portfolio;
+  const statusCounts = ["Aktif", "Beklemede", "Satıldı"].map(s => ({
+    label: s,
+    count: list.filter(p => p.status === s).length
+  }));
+  const typeCounts = ["Satılık", "Kiralık"].map(t => ({
+    label: t,
+    count: list.filter(p => p.type === t).length
+  }));
+  const maxStatus = Math.max(1, ...statusCounts.map(s => s.count));
+  const maxType = Math.max(1, ...typeCounts.map(s => s.count));
+  const ortalamaFiyat = list.length ? list.reduce((s, p) => s + (Number(p.price) || 0), 0) / list.length : 0;
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(SectionHeader, {
+    icon: "chart",
+    title: "Gayrimenkul Piyasa Analizi",
+    accent: "teal"
+  }), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: 12,
+      color: "#64748b",
+      marginBottom: 16
+    }
+  }, "Kendi Portföy & Potansiyel verilerine göre otomatik hesaplanır."), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-2",
+    style: {
+      marginBottom: 16
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600,
+      marginBottom: 16
+    }
+  }, "Portföy Durum Dağılımı"), statusCounts.map(s => /*#__PURE__*/React.createElement("div", {
+    key: s.label,
+    style: {
+      marginBottom: 10
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row between",
+    style: {
+      fontSize: 12,
+      color: "#94a3b8",
+      marginBottom: 4
+    }
+  }, /*#__PURE__*/React.createElement("span", null, s.label), /*#__PURE__*/React.createElement("span", null, s.count)), /*#__PURE__*/React.createElement("div", {
+    className: "bar-track"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bar-fill",
+    style: {
+      width: `${s.count / maxStatus * 100}%`
+    }
+  }))))), /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600,
+      marginBottom: 16
+    }
+  }, "Satılık / Kiralık Dağılımı"), typeCounts.map(s => /*#__PURE__*/React.createElement("div", {
+    key: s.label,
+    style: {
+      marginBottom: 10
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row between",
+    style: {
+      fontSize: 12,
+      color: "#94a3b8",
+      marginBottom: 4
+    }
+  }, /*#__PURE__*/React.createElement("span", null, s.label), /*#__PURE__*/React.createElement("span", null, s.count)), /*#__PURE__*/React.createElement("div", {
+    className: "bar-track"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bar-fill",
+    style: {
+      width: `${s.count / maxType * 100}%`,
+      background: "#34d399"
+    }
+  })))))), /*#__PURE__*/React.createElement(StatCard, {
+    label: "Ortalama İlan Değeri",
+    value: money(ortalamaFiyat),
+    sub: `${list.length} ilan üzerinden`,
+    accent: "gold"
+  }));
+}
+function PerformanceReports({
+  appData
+}) {
+  const totalIncome = appData.income.reduce((s, i) => s + (Number(i.amount) || 0), 0);
+  const totalExpense = appData.expenses.reduce((s, e) => s + (Number(e.amount) || 0), 0);
+  const maxFin = Math.max(1, totalIncome, totalExpense);
+  const tamamlananGorev = appData.tasks.filter(t => t.completed).length;
+  const gorevOrani = appData.tasks.length ? tamamlananGorev / appData.tasks.length * 100 : 0;
+  const bugun = new Date();
+  const buAyEklenenPortfoy = appData.portfolio.filter(p => {
+    if (!p.createdAt) return false;
+    const d = new Date(p.createdAt);
+    return d.getMonth() === bugun.getMonth() && d.getFullYear() === bugun.getFullYear();
+  }).length;
+  const bekleyenOdeme = appData.expenses.filter(e => !e.paid).length;
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(SectionHeader, {
+    icon: "trending",
+    title: "İş & Performans Raporları",
+    accent: "gold"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-4",
+    style: {
+      marginBottom: 16
+    }
+  }, /*#__PURE__*/React.createElement(StatCard, {
+    label: "Görev Tamamlama Oranı",
+    value: `%${gorevOrani.toFixed(0)}`,
+    sub: `${tamamlananGorev}/${appData.tasks.length}`,
+    accent: "teal"
+  }), /*#__PURE__*/React.createElement(StatCard, {
+    label: "Randevu Sayısı",
+    value: appData.appointments.length,
+    accent: "gold"
+  }), /*#__PURE__*/React.createElement(StatCard, {
+    label: "Bu Ay Eklenen Portföy",
+    value: buAyEklenenPortfoy,
+    accent: "teal"
+  }), /*#__PURE__*/React.createElement(StatCard, {
+    label: "Bekleyen Ödeme",
+    value: bekleyenOdeme,
+    accent: "rose"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600,
+      marginBottom: 16
+    }
+  }, "Gelir / Gider Karşılaştırması"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: 10
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row between",
+    style: {
+      fontSize: 12,
+      color: "#94a3b8",
+      marginBottom: 4
+    }
+  }, /*#__PURE__*/React.createElement("span", null, "Gelir"), /*#__PURE__*/React.createElement("span", null, money(totalIncome))), /*#__PURE__*/React.createElement("div", {
+    className: "bar-track"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bar-fill",
+    style: {
+      width: `${totalIncome / maxFin * 100}%`,
+      background: "#34d399"
+    }
+  }))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "row between",
+    style: {
+      fontSize: 12,
+      color: "#94a3b8",
+      marginBottom: 4
+    }
+  }, /*#__PURE__*/React.createElement("span", null, "Gider"), /*#__PURE__*/React.createElement("span", null, money(totalExpense))), /*#__PURE__*/React.createElement("div", {
+    className: "bar-track"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bar-fill",
+    style: {
+      width: `${totalExpense / maxFin * 100}%`,
+      background: "#fb7185"
+    }
+  })))));
+}
+function SmartSearch({
+  appData
+}) {
+  const [query, setQuery] = useState("");
+  const q = query.trim().toLowerCase();
+  const searchable = [{
+    key: "tasks",
+    label: "Görevler",
+    icon: "tasks",
+    primary: "title"
+  }, {
+    key: "appointments",
+    label: "Randevular",
+    icon: "calendar",
+    primary: "title"
+  }, {
+    key: "income",
+    label: "Gelir Yönetimi",
+    icon: "trending",
+    primary: "description"
+  }, {
+    key: "expenses",
+    label: "Gider & Ödemeler",
+    icon: "wallet",
+    primary: "description"
+  }, {
+    key: "bankAssets",
+    label: "Banka & Varlıklar",
+    icon: "piggy",
+    primary: "name"
+  }, {
+    key: "portfolio",
+    label: "Portföy & Potansiyel",
+    icon: "building",
+    primary: "title"
+  }, {
+    key: "siteData",
+    label: "Site Dataları",
+    icon: "database",
+    primary: "siteName"
+  }, {
+    key: "contacts",
+    label: "Müşteri & Danışman",
+    icon: "users",
+    primary: "name"
+  }, {
+    key: "documents",
+    label: "Ofis & Evrak",
+    icon: "folder",
+    primary: "title"
+  }, {
+    key: "sectorEvents",
+    label: "Sektör Takvimi",
+    icon: "calendar",
+    primary: "title"
+  }];
+  const results = q ? searchable.map(s => ({
+    ...s,
+    matches: (appData[s.key] || []).filter(row => Object.values(row).join(" ").toLowerCase().includes(q))
+  })).filter(s => s.matches.length > 0) : [];
+  const totalMatches = results.reduce((s, r) => s + r.matches.length, 0);
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(SectionHeader, {
+    icon: "search",
+    title: "Akıllı Arama",
+    accent: "teal"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      marginBottom: 16
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row gap-2"
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "search",
+    size: 16,
+    style: {
+      color: "#64748b"
+    }
+  }), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    style: {
+      border: "none",
+      background: "transparent",
+      fontSize: 15
+    },
+    placeholder: "Görev, randevu, ilan, müşteri, evrak... tüm uygulamada ara",
+    value: query,
+    onChange: e => setQuery(e.target.value),
+    autoFocus: true
+  }))), !q && /*#__PURE__*/React.createElement("div", {
+    className: "list-empty"
+  }, "Aramaya başlamak için yukarıya yaz — tüm bölümlerde eş zamanlı arar."), q && totalMatches === 0 && /*#__PURE__*/React.createElement("div", {
+    className: "list-empty"
+  }, "\"", query, "\" için hiçbir bölümde sonuç bulunamadı."), results.map(r => /*#__PURE__*/React.createElement("div", {
+    key: r.key,
+    className: "card",
+    style: {
+      marginBottom: 12
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row gap-2",
+    style: {
+      marginBottom: 10
+    }
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: r.icon,
+    size: 15,
+    style: {
+      color: "#fcd34d"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600
+    }
+  }, r.label), /*#__PURE__*/React.createElement("span", {
+    className: "count-pill"
+  }, r.matches.length, " sonuç")), r.matches.slice(0, 6).map(m => /*#__PURE__*/React.createElement("div", {
+    key: m.id,
+    style: {
+      fontSize: 13,
+      color: "#cbd5e1",
+      padding: "4px 0"
+    }
+  }, m[r.primary] || Object.values(m)[0])))));
+}
+function AutomationRules({
+  appData,
+  persist
+}) {
+  const rules = appData.automationRules;
+  const [running, setRunning] = useState(false);
+  const [log, setLog] = useState("");
+  const updateRules = patch => persist({
+    ...appData,
+    automationRules: {
+      ...rules,
+      ...patch
+    }
+  });
+  const runNow = () => {
+    setRunning(true);
+    const today = new Date();
+    const limit = new Date(today.getTime() + (Number(rules.paymentReminderDays) || 0) * 86400000);
+    const candidates = appData.expenses.filter(e => {
+      if (e.paid || !e.dueDate) return false;
+      const d = new Date(e.dueDate);
+      return d >= new Date(today.toDateString()) && d <= limit;
+    });
+    const existingLinks = new Set(appData.tasks.map(t => t.linkedExpenseId).filter(Boolean));
+    const newTasks = candidates.filter(e => !existingLinks.has(e.id)).map(e => ({
+      id: uid(),
+      title: `Ödeme hatırlatması: ${e.description}`,
+      dueDate: e.dueDate,
+      priority: "Yüksek",
+      completed: false,
+      linkedExpenseId: e.id,
+      createdAt: new Date().toISOString()
+    }));
+    if (newTasks.length > 0) {
+      persist({
+        ...appData,
+        tasks: [...newTasks, ...appData.tasks]
+      });
+      setLog(`${newTasks.length} yeni hatırlatma görevi oluşturuldu.`);
+    } else {
+      setLog("Kural çalıştırıldı — oluşturulacak yeni hatırlatma yok (ya kriter dışı ya da zaten oluşturulmuş).");
+    }
+    setRunning(false);
+  };
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(SectionHeader, {
+    icon: "refresh",
+    title: "Otomasyon Kuralları",
+    accent: "gold"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      marginBottom: 16
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600,
+      marginBottom: 4
+    }
+  }, "Ödeme Hatırlatma Kuralı"), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: 12,
+      color: "#64748b",
+      marginBottom: 14
+    }
+  }, "Vadesi yaklaşan ödenmemiş giderler için otomatik olarak Görevler bölümüne hatırlatma görevi ekler. Aynı ödeme için tekrar görev oluşturmaz."), /*#__PURE__*/React.createElement("div", {
+    className: "row gap-3 wrap",
+    style: {
+      marginBottom: 14
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: `toggle-pill ${rules.paymentReminderEnabled ? "on" : ""}`,
+    onClick: () => updateRules({
+      paymentReminderEnabled: !rules.paymentReminderEnabled
+    })
+  }, rules.paymentReminderEnabled ? "Aktif" : "Kapalı"), /*#__PURE__*/React.createElement("div", {
+    className: "row gap-2"
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 12,
+      color: "#94a3b8"
+    }
+  }, "Vadeye kaç gün kala:"), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    type: "number",
+    style: {
+      width: 70
+    },
+    value: rules.paymentReminderDays,
+    onChange: e => updateRules({
+      paymentReminderDays: Number(e.target.value)
+    })
+  }))), /*#__PURE__*/React.createElement("button", {
+    className: "btn",
+    onClick: runNow,
+    disabled: running || !rules.paymentReminderEnabled
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "refresh",
+    size: 14
+  }), " Kuralı Şimdi Çalıştır"), log && /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: "#6ee7b7",
+      marginTop: 10
+    }
+  }, log)), /*#__PURE__*/React.createElement("div", {
+    className: "list-empty"
+  }, "Daha fazla otomasyon kuralı (randevu hatırlatma, sözleşme yenileme vb.) zamanla eklenebilir — şu an tek çalışan kural yukarıdakidir."));
+}
+function OfficialGazette() {
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(SectionHeader, {
+    icon: "folder",
+    title: "Resmî Gazete Takibi",
+    accent: "rose"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: 13,
+      color: "#cbd5e1",
+      marginBottom: 14
+    }
+  }, "Emlak, vergi, imar ve kira mevzuatındaki değişiklikleri T.C. Resmî Gazete'nin resmî sitesinden takip edebilirsin. Uygulama, gerçek olmayan bir haber akışı üretmek yerine seni doğrudan resmi kaynağa yönlendirir."), /*#__PURE__*/React.createElement("a", {
+    href: "https://www.resmigazete.gov.tr/",
+    target: "_blank",
+    rel: "noopener noreferrer",
+    className: "btn",
+    style: {
+      display: "inline-flex",
+      textDecoration: "none"
+    }
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "chevron",
+    size: 14
+  }), " resmigazete.gov.tr'yi Aç"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 16,
+      fontSize: 12,
+      color: "#64748b"
+    }
+  }, "İpucu: Sık aradığın konuları (kira, tapu harcı, imar) Sektör Takvimi'ne \"Vergi/Beyan Tarihi\" olarak not düşüp hatırlatma olarak kullanabilirsin.")));
+}
+function HotPortfolioMatching({
+  appData
+}) {
+  const customers = appData.contacts.filter(c => c.role === "Müşteri");
+  const listings = appData.portfolio;
+  const score = (customer, listing) => {
+    if (!customer || !listing) return 0;
+    let points = 0;
+    const typeMatch = customer.notes && listing.type && customer.notes.toLowerCase().includes(listing.type.toLowerCase());
+    if (typeMatch) points += 50;
+    const priceMatch = customer.notes && listing.price && customer.notes.includes("bütçe") && listing.price > 0;
+    if (priceMatch) points += 30;
+    if (customer.notes && listing.location && customer.notes.toLowerCase().includes(listing.location.toLowerCase())) points += 20;
+    return points;
+  };
+  const matches = [];
+  customers.forEach(cust => {
+    listings.forEach(list => {
+      const sc = score(cust, list);
+      if (sc > 0) matches.push({
+        customer: cust,
+        listing: list,
+        score: sc
+      });
+    });
+  });
+  matches.sort((a, b) => b.score - a.score);
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(SectionHeader, {
+    icon: "zap",
+    title: "Sıcak Portföy Yakalama",
+    accent: "teal"
+  }), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: 12,
+      color: "#64748b",
+      marginBottom: 16
+    }
+  }, "Müşteri & Danışman bölümünde her müşterinin \"Not\" alanına (örn. \"3+1, bütçe 3M, Gaziosmanpaşa\") yazdığın gereksinime göre Portföy & Potansiyel'deki ilanları otomatik eşleştirir."), matches.length === 0 && /*#__PURE__*/React.createElement("div", {
+    className: "list-empty"
+  }, "Müşteri gereksinimi ve uygun ilan yok — Müşteri & Danışman'a yapılandırılmış notlar ekle."), matches.map((m, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    className: "card",
+    style: {
+      marginBottom: 12
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row between",
+    style: {
+      marginBottom: 6
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      fontWeight: 600,
+      color: "#fcd34d"
+    }
+  }, m.customer.name), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: "#94a3b8"
+    }
+  }, m.customer.notes)), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600,
+      color: "#34d399"
+    }
+  }, "%", m.score)), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: "#cbd5e1",
+      padding: "6px 0",
+      borderTop: "1px solid var(--border)",
+      paddingTop: 8
+    }
+  }, /*#__PURE__*/React.createElement("b", null, "Eşleşen ilan:"), " ", m.listing.title, " · ", m.listing.type, " · ", money(m.listing.price), " · ", m.listing.location))));
+}
+function CommissionForecast({
+  appData
+}) {
+  const listings = appData.portfolio.filter(p => p.status === "Aktif");
+  const avgPrice = listings.length ? listings.reduce((s, l) => s + (Number(l.price) || 0), 0) / listings.length : 0;
+  const totalValue = listings.reduce((s, l) => s + (Number(l.price) || 0), 0);
+  const expectedClosureRate = 0.35; // %35 satış oranı tahmini
+  const avgCommissionRate = 0.025; // %2.5 ort. komisyon
+  const forecastCommission = totalValue * expectedClosureRate * avgCommissionRate;
+  const monthlyForecast = forecastCommission / 3;
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(SectionHeader, {
+    icon: "trending",
+    title: "Potansiyel Komisyon Havuzu",
+    accent: "gold"
+  }), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: 12,
+      color: "#64748b",
+      marginBottom: 14
+    }
+  }, "Açık ilanların toplam değeri × beklenen satış oranı (%35) × ortalama komisyon (%2.5) = tahmini gelir. Bu hafızaya dayalı tahmin; gerçek satışlara bağlı değişir."), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-4",
+    style: {
+      marginBottom: 16
+    }
+  }, /*#__PURE__*/React.createElement(StatCard, {
+    label: "Aktif İlan Sayısı",
+    value: listings.length,
+    accent: "teal"
+  }), /*#__PURE__*/React.createElement(StatCard, {
+    label: "Toplam Portföy Değeri",
+    value: money(totalValue),
+    accent: "gold"
+  }), /*#__PURE__*/React.createElement(StatCard, {
+    label: "Ortalama İlan Değeri",
+    value: money(avgPrice),
+    accent: "teal"
+  }), /*#__PURE__*/React.createElement(StatCard, {
+    label: "Beklenen Satış Oranı",
+    value: "%35",
+    accent: "rose"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600,
+      marginBottom: 10
+    }
+  }, "Tahmini Komisyon Geliri"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: 8
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row between",
+    style: {
+      fontSize: 12,
+      color: "#94a3b8",
+      marginBottom: 4
+    }
+  }, /*#__PURE__*/React.createElement("span", null, "3 Aylık Toplam (tahmini)"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 16,
+      fontWeight: 600,
+      color: "#fcd34d"
+    }
+  }, money(forecastCommission))), /*#__PURE__*/React.createElement("div", {
+    className: "bar-track"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bar-fill",
+    style: {
+      width: "100%",
+      background: "#fcd34d"
+    }
+  }))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: "#cbd5e1",
+      marginTop: 10,
+      paddingTop: 10,
+      borderTop: "1px solid var(--border)"
+    }
+  }, "Aylık ortalama: ", /*#__PURE__*/React.createElement("b", null, money(monthlyForecast)), " · Not: Tahmin %35 satış ve %2.5 komisyon oranına göre — gerçek satışlara göre değişir.")));
+}
+function ContentStudio({
+  appData,
+  persist
+}) {
+  const [listingSelect, setListingSelect] = useState("");
+  const [generatedPost, setGeneratedPost] = useState("");
+  const [platform, setPlatform] = useState("instagram");
+  const listings = appData.portfolio;
+  const selectedListing = listings.find(l => l.id === listingSelect);
+  const generatePost = async () => {
+    if (!selectedListing || !window.storage) return;
+    try {
+      const stored = await window.storage.get("groqApiKey");
+      const apiKey = stored && stored.value;
+      if (!apiKey) {
+        alert("AI Asistan'da Groq API anahtarı ayarla");
+        return;
+      }
+      const prompt = `Bir gayrimenkul ilanı için ${platform === "instagram" ? "Instagram" : "Facebook"} yazısı yaz.\n\nİlan: ${selectedListing.title}\nTür: ${selectedListing.type}\nFiyat: ${money(selectedListing.price)}\nKonum: ${selectedListing.location}\nDurum: ${selectedListing.status}\n\nYaz: İlgi çekici, kısa (%${platform === "instagram" ? 150 : 300} kelime), uygun hashtag'ler, emoji içeren bir ${platform === "instagram" ? "Instagram" : "Facebook"} yazısı. Müşteri çekmek için ikna edici ve yapılandırılmış ol.`;
+      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: "openai/gpt-oss-120b",
+          messages: [{
+            role: "user",
+            content: prompt
+          }],
+          temperature: 0.7,
+          max_tokens: 500
+        })
+      });
+      const data = await response.json();
+      if (data.choices && data.choices[0]) {
+        const text = data.choices[0].message.content;
+        setGeneratedPost(text);
+        persist({
+          ...appData,
+          contentOutbox: [{
+            id: uid(),
+            listing: selectedListing.id,
+            platform,
+            text,
+            date: new Date().toISOString()
+          }, ...appData.contentOutbox]
+        });
+      } else {
+        alert("Yanıt alınamadı: " + (data.error && data.error.message || "API hatası"));
+      }
+    } catch (e) {
+      alert("Hata: " + e.message);
+    }
+  };
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(generatedPost);
+    alert("Panoya kopyalandı");
+  };
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(SectionHeader, {
+    icon: "edit",
+    title: "İçerik Stüdyosu",
+    accent: "gold"
+  }), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: 12,
+      color: "#64748b",
+      marginBottom: 14
+    }
+  }, "İlanlarından otomatik sosyal medya yazıları üret. AI asistan, ilanın detaylarından ilgi çekici bir post yazısı oluşturur."), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      marginBottom: 16
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row gap-2",
+    style: {
+      marginBottom: 10
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "label"
+  }, "İlan Seç"), /*#__PURE__*/React.createElement("select", {
+    className: "input",
+    value: listingSelect,
+    onChange: e => setListingSelect(e.target.value),
+    style: {
+      marginBottom: 0
+    }
+  }, /*#__PURE__*/React.createElement("option", {
+    value: ""
+  }, "-- İlan Seç --"), listings.map(l => /*#__PURE__*/React.createElement("option", {
+    key: l.id,
+    value: l.id
+  }, l.title, " (", l.type, ")")))), /*#__PURE__*/React.createElement("div", {
+    className: "row gap-2",
+    style: {
+      marginBottom: 14
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "label"
+  }, "Platform"), /*#__PURE__*/React.createElement("select", {
+    className: "input",
+    value: platform,
+    onChange: e => setPlatform(e.target.value),
+    style: {
+      marginBottom: 0
+    }
+  }, /*#__PURE__*/React.createElement("option", {
+    value: "instagram"
+  }, "Instagram"), /*#__PURE__*/React.createElement("option", {
+    value: "facebook"
+  }, "Facebook"))), /*#__PURE__*/React.createElement("button", {
+    className: "btn",
+    onClick: generatePost,
+    disabled: !selectedListing,
+    style: {
+      display: "inline-flex",
+      gap: 6
+    }
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "bot",
+    size: 14
+  }), " AI ile Yazı Üret")), generatedPost && /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      fontWeight: 600,
+      marginBottom: 10
+    }
+  }, "Oluşturulan Yazı"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: "#e2e8f0",
+      lineHeight: 1.6,
+      padding: 10,
+      background: "var(--panel)",
+      borderRadius: 6,
+      marginBottom: 10
+    }
+  }, generatedPost), /*#__PURE__*/React.createElement("button", {
+    className: "btn-ghost",
+    style: {
+      fontSize: 11
+    },
+    onClick: copyToClipboard
+  }, "Panoya Kopyala")));
+}
+function CareerPlanning({
+  appData,
+  persist
+}) {
+  const goals = appData.careerGoals || {};
+  const updateGoals = patch => persist({
+    ...appData,
+    careerGoals: {
+      ...goals,
+      ...patch
+    }
+  });
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(SectionHeader, {
+    icon: "target",
+    title: "30-60-90 Günlük Hedef Planlama",
+    accent: "teal"
+  }), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: 12,
+      color: "#64748b",
+      marginBottom: 14
+    }
+  }, "İlk 3 ayda ulaşmak istediğin hedefleri (gelir, satış sayısı, yeni müşteri) yazarak motivasyonunuzu canlı tut ve ilerlemeni ölç."), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-3",
+    style: {
+      marginBottom: 16
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600,
+      color: "#fcd34d",
+      marginBottom: 8
+    }
+  }, "30. Gün"), /*#__PURE__*/React.createElement("textarea", {
+    className: "input",
+    style: {
+      fontSize: 11,
+      height: 80,
+      marginBottom: 0
+    },
+    value: goals.period30day || "",
+    onChange: e => updateGoals({
+      period30day: e.target.value
+    }),
+    placeholder: "Örn: 2 mülk satışı, 10 yeni müşteri kontağı"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600,
+      color: "#fcd34d",
+      marginBottom: 8
+    }
+  }, "60. Gün"), /*#__PURE__*/React.createElement("textarea", {
+    className: "input",
+    style: {
+      fontSize: 11,
+      height: 80,
+      marginBottom: 0
+    },
+    value: goals.period60day || "",
+    onChange: e => updateGoals({
+      period60day: e.target.value
+    }),
+    placeholder: "Örn: İlk satıştan komisyon tahsil"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600,
+      color: "#fcd34d",
+      marginBottom: 8
+    }
+  }, "90. Gün"), /*#__PURE__*/React.createElement("textarea", {
+    className: "input",
+    style: {
+      fontSize: 11,
+      height: 80,
+      marginBottom: 0
+    },
+    value: goals.period90day || "",
+    onChange: e => updateGoals({
+      period90day: e.target.value
+    }),
+    placeholder: "Örn: Kurulu portföy 10+ ilan, ortalama aylık gelir X ₺"
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600,
+      marginBottom: 10
+    }
+  }, "Finansal Hedefler"), /*#__PURE__*/React.createElement("label", {
+    className: "label"
+  }, "3 Aylık Hedef Gelir (₺)"), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    type: "number",
+    value: goals.targetIncome || 0,
+    onChange: e => updateGoals({
+      targetIncome: Number(e.target.value)
+    }),
+    style: {
+      marginBottom: 10
+    }
+  }), /*#__PURE__*/React.createElement("label", {
+    className: "label"
+  }, "Hedef Satış Sayısı"), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    type: "number",
+    value: goals.targetClosures || 0,
+    onChange: e => updateGoals({
+      targetClosures: Number(e.target.value)
+    }),
+    style: {
+      marginBottom: 0
+    }
+  })));
+}
+function ShareBar({
+  title,
+  lines
+}) {
+  const buildText = () => `*${title}*\n${lines.map(l => `${l.label}: ${l.value}`).join("\n")}\n\n${APP_NAME} ${APP_SUB}`;
+
+  // PDF'de Türkçe karakterlerin (ı/İ/ş/Ş/ğ/Ğ) ve ₺ işaretinin bozulmadan görünmesi için
+  // uygulamaya küçük (17 KB), sadece bu karakterleri içeren bir DejaVu Sans alt kümesi
+  // gömülü — jsPDF'in varsayılan fontunun aksine bu font tam Türkçe destekler.
+  // Güvenlik ağı: fontun kapsamadığı beklenmedik bir sembol gelirse (emoji vb.) sessizce atılır.
+  const sanitizeForPdf = s => String(s).replace(/[^\x20-\x7E\xA0\xB2\xC7\xD6\xDC\xE7\xF6\xFC\u011E\u011F\u0130\u0131\u015E\u015F\u20BA\u2022]/g, "");
+  const sendWhatsapp = () => {
+    const text = buildText();
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+  };
+  const downloadPdf = () => {
+    try {
+      const {
+        jsPDF
+      } = window.jspdf;
+      const doc = new jsPDF();
+      doc.addFileToVFS("DejaVuSans-tr.ttf", TR_FONT_BASE64);
+      doc.addFont("DejaVuSans-tr.ttf", "DejaVuTR", "normal");
+      doc.setFont("DejaVuTR");
+      doc.setFontSize(14);
+      doc.text(sanitizeForPdf(title), 14, 18);
+      doc.setFontSize(10);
+      doc.text(sanitizeForPdf(`${APP_NAME} ${APP_SUB}`), 14, 25);
+      doc.setDrawColor(200);
+      doc.line(14, 29, 196, 29);
+      let y = 40;
+      lines.forEach(l => {
+        doc.setFontSize(11);
+        doc.text(sanitizeForPdf(`${l.label}:`), 14, y);
+        doc.text(sanitizeForPdf(String(l.value)), 90, y);
+        y += 9;
+      });
+      doc.setFontSize(8);
+      doc.setTextColor(150);
+      doc.text(sanitizeForPdf(new Date().toLocaleString("tr-TR")), 14, y + 8);
+      doc.save(`${sanitizeForPdf(title).replace(/[^\w ığüşöçİĞÜŞÖÇ]/g, "")}.pdf`);
+    } catch (e) {
+      alert("PDF oluşturulamadı: " + (e.message || "bilinmeyen hata"));
+    }
+  };
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 14,
+      borderTop: "1px solid var(--border)",
+      paddingTop: 12
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row gap-2"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn-ghost",
+    style: {
+      display: "inline-flex",
+      alignItems: "center",
+      gap: 6,
+      fontSize: 12
+    },
+    onClick: downloadPdf
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "save",
+    size: 13
+  }), " PDF İndir"), /*#__PURE__*/React.createElement("button", {
+    className: "btn-ghost",
+    style: {
+      display: "inline-flex",
+      alignItems: "center",
+      gap: 6,
+      fontSize: 12,
+      color: "#6ee7b7",
+      borderColor: "var(--emerald-bd)"
+    },
+    onClick: sendWhatsapp
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "send",
+    size: 13
+  }), " WhatsApp ile Gönder")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 10,
+      color: "#475569",
+      marginTop: 6
+    }
+  }, "PDF ve WhatsApp mesajı Türkçe karakterlerle (ı, ş, ğ, ₺ dahil) birebir aynı görünür."));
+}
+function ResultRow({
+  label,
+  value,
+  big
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "row between",
+    style: {
+      marginBottom: 6
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 13,
+      color: "#94a3b8"
+    }
+  }, label), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: big ? 17 : 13,
+      fontWeight: big ? 600 : 500,
+      color: big ? "#fcd34d" : "#e2e8f0"
+    }
+  }, value));
+}
+const CALC_LIST = [{
+  id: "tapu",
+  label: "Tapu ve Satış Masrafı"
+}, {
+  id: "kiraci",
+  label: "Kiralama Kiracı Masrafı Hesaplama"
+}, {
+  id: "kredi",
+  label: "Konut Kredisi Hesaplama"
+}, {
+  id: "kiraartis",
+  label: "Kira Artış Hesaplama"
+}, {
+  id: "emsal",
+  label: "Arsa Emsal ve İnşaat Alanı"
+}, {
+  id: "insaat",
+  label: "İnşaat m² Maliyet Hesabı"
+}, {
+  id: "donusum",
+  label: "Kentsel Dönüşüm Paylaşımı"
+}, {
+  id: "degerleme",
+  label: "Mülk Değerlendirme Raporu"
+}, {
+  id: "yatirim",
+  label: "Gayrimenkul Yatırım Performansı"
+}, {
+  id: "portfoymaliyet",
+  label: "Portföy Maliyet Raporu"
+}, {
+  id: "portfoyperf",
+  label: "Portföy Faaliyet & Performans Raporu"
+}, {
+  id: "komisyon",
+  label: "Satış Komisyonu Hesaplayıcı"
+}];
+function CalcTapu() {
+  const [price, setPrice] = useState("");
+  const [donerSermaye, setDonerSermaye] = useState("");
+  const p = Number(price) || 0;
+  const ds = Number(donerSermaye) || 0;
+  const aliciHarci = p * 0.02;
+  const saticiHarci = p * 0.02;
+  const toplamHarc = aliciHarci + saticiHarci;
+  const genelToplam = toplamHarc + ds;
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: 12,
+      color: "#64748b",
+      marginBottom: 14
+    }
+  }, "492 sayılı Harçlar Kanunu'na göre 2026 tapu harcı: satış bedelinin %2'si alıcıdan, %2'si satıcıdan — toplam %4. Döner sermaye hizmet bedeli bölgeye göre değiştiği için kendin girmelisin (güncel tutarı Tapu Müdürlüğü'nden teyit et)."), /*#__PURE__*/React.createElement("label", {
+    className: "label"
+  }, "Satış Bedeli (₺)"), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    type: "number",
+    value: price,
+    onChange: e => setPrice(e.target.value),
+    style: {
+      marginBottom: 10
+    }
+  }), /*#__PURE__*/React.createElement("label", {
+    className: "label"
+  }, "Döner Sermaye Bedeli (₺, opsiyonel)"), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    type: "number",
+    value: donerSermaye,
+    onChange: e => setDonerSermaye(e.target.value),
+    style: {
+      marginBottom: 14
+    }
+  }), /*#__PURE__*/React.createElement(ResultRow, {
+    label: "Alıcı Tapu Harcı (%2)",
+    value: money(aliciHarci)
+  }), /*#__PURE__*/React.createElement(ResultRow, {
+    label: "Satıcı Tapu Harcı (%2)",
+    value: money(saticiHarci)
+  }), /*#__PURE__*/React.createElement(ResultRow, {
+    label: "Toplam Tapu Harcı (%4)",
+    value: money(toplamHarc),
+    big: true
+  }), /*#__PURE__*/React.createElement(ResultRow, {
+    label: "Genel Toplam (+ döner sermaye)",
+    value: money(genelToplam)
+  }), /*#__PURE__*/React.createElement(ShareBar, {
+    title: "Tapu ve Satış Masrafı Hesabı",
+    lines: [{
+      label: "Satış Bedeli",
+      value: money(p)
+    }, {
+      label: "Alıcı Harcı (%2)",
+      value: money(aliciHarci)
+    }, {
+      label: "Satıcı Harcı (%2)",
+      value: money(saticiHarci)
+    }, {
+      label: "Toplam Harç (%4)",
+      value: money(toplamHarc)
+    }, {
+      label: "Döner Sermaye",
+      value: money(ds)
+    }, {
+      label: "Genel Toplam",
+      value: money(genelToplam)
+    }]
+  }));
+}
+function CalcKiraci() {
+  const [kira, setKira] = useState("");
+  const [kdv, setKdv] = useState("20");
+  const [depozitoAy, setDepozitoAy] = useState("2");
+  const k = Number(kira) || 0;
+  const kdvOran = Number(kdv) / 100 || 0;
+  const komisyon = k * (1 + kdvOran);
+  const depozito = k * (Number(depozitoAy) || 0);
+  const ilkOdeme = k + komisyon + depozito;
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: 12,
+      color: "#64748b",
+      marginBottom: 14
+    }
+  }, "Taşınmaz Ticareti Hakkında Yönetmelik m.20 uyarınca kiralamada emlakçı komisyonu üst sınırı KDV hariç 1 aylık kira bedelidir; genel KDV oranı %20'dir."), /*#__PURE__*/React.createElement("label", {
+    className: "label"
+  }, "Aylık Kira (₺)"), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    type: "number",
+    value: kira,
+    onChange: e => setKira(e.target.value),
+    style: {
+      marginBottom: 10
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-2",
+    style: {
+      marginBottom: 14
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "label"
+  }, "KDV Oranı (%)"), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    type: "number",
+    value: kdv,
+    onChange: e => setKdv(e.target.value)
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "label"
+  }, "Depozito (kaç aylık kira)"), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    type: "number",
+    value: depozitoAy,
+    onChange: e => setDepozitoAy(e.target.value)
+  }))), /*#__PURE__*/React.createElement(ResultRow, {
+    label: "Emlakçı Komisyonu (1 ay + KDV)",
+    value: money(komisyon)
+  }), /*#__PURE__*/React.createElement(ResultRow, {
+    label: "Depozito",
+    value: money(depozito)
+  }), /*#__PURE__*/React.createElement(ResultRow, {
+    label: "İlk Ay Kira",
+    value: money(k)
+  }), /*#__PURE__*/React.createElement(ResultRow, {
+    label: "Toplam İlk Ödeme",
+    value: money(ilkOdeme),
+    big: true
+  }), /*#__PURE__*/React.createElement(ShareBar, {
+    title: "Kiralama Kiracı Masrafı Hesabı",
+    lines: [{
+      label: "Aylık Kira",
+      value: money(k)
+    }, {
+      label: "Emlakçı Komisyonu (+KDV)",
+      value: money(komisyon)
+    }, {
+      label: "Depozito",
+      value: money(depozito)
+    }, {
+      label: "Toplam İlk Ödeme",
+      value: money(ilkOdeme)
+    }]
+  }));
+}
+function CalcKredi() {
+  const [principal, setPrincipal] = useState("");
+  const [months, setMonths] = useState("12");
+  const [annualRate, setAnnualRate] = useState("3");
+  const r = (Number(annualRate) || 0) / 100 / 12;
+  const n = Number(months) || 1;
+  const p = Number(principal) || 0;
+  const monthlyPayment = r === 0 ? p / n : p * r / (1 - Math.pow(1 + r, -n));
+  const toplamGeriOdeme = monthlyPayment * n;
+  const toplamFaiz = toplamGeriOdeme - p;
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "label"
+  }, "Anapara (₺)"), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    type: "number",
+    value: principal,
+    onChange: e => setPrincipal(e.target.value),
+    style: {
+      marginBottom: 10
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-2",
+    style: {
+      marginBottom: 14
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "label"
+  }, "Vade (Ay)"), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    type: "number",
+    value: months,
+    onChange: e => setMonths(e.target.value)
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "label"
+  }, "Yıllık Faiz (%)"), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    type: "number",
+    value: annualRate,
+    onChange: e => setAnnualRate(e.target.value)
+  }))), /*#__PURE__*/React.createElement(ResultRow, {
+    label: "Aylık Taksit",
+    value: money(monthlyPayment),
+    big: true
+  }), /*#__PURE__*/React.createElement(ResultRow, {
+    label: "Toplam Geri Ödeme",
+    value: money(toplamGeriOdeme)
+  }), /*#__PURE__*/React.createElement(ResultRow, {
+    label: "Toplam Faiz Yükü",
+    value: money(toplamFaiz)
+  }), /*#__PURE__*/React.createElement(ShareBar, {
+    title: "Konut Kredisi Hesabı",
+    lines: [{
+      label: "Anapara",
+      value: money(p)
+    }, {
+      label: "Vade",
+      value: `${n} ay`
+    }, {
+      label: "Yıllık Faiz",
+      value: `%${annualRate}`
+    }, {
+      label: "Aylık Taksit",
+      value: money(monthlyPayment)
+    }, {
+      label: "Toplam Geri Ödeme",
+      value: money(toplamGeriOdeme)
+    }]
+  }));
+}
+function CalcKiraArtis() {
+  const [mevcutKira, setMevcutKira] = useState("");
+  const [oran, setOran] = useState("");
+  const m = Number(mevcutKira) || 0;
+  const o = Number(oran) / 100 || 0;
+  const yeniKira = m * (1 + o);
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: 12,
+      color: "#64748b",
+      marginBottom: 14
+    }
+  }, "Türk Borçlar Kanunu m.344 uyarınca konut kiralarında artış oranı TÜİK'in açıkladığı 12 aylık ortalama TÜFE değişim oranını aşamaz. Güncel oranı TÜİK'ten kontrol edip aşağıya kendin gir — sabit bir oran varsaymak yanıltıcı olur."), /*#__PURE__*/React.createElement("label", {
+    className: "label"
+  }, "Mevcut Kira (₺)"), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    type: "number",
+    value: mevcutKira,
+    onChange: e => setMevcutKira(e.target.value),
+    style: {
+      marginBottom: 10
+    }
+  }), /*#__PURE__*/React.createElement("label", {
+    className: "label"
+  }, "Artış Oranı (%) — TÜİK 12 aylık ortalama TÜFE"), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    type: "number",
+    value: oran,
+    onChange: e => setOran(e.target.value),
+    style: {
+      marginBottom: 14
+    }
+  }), /*#__PURE__*/React.createElement(ResultRow, {
+    label: "Artış Tutarı",
+    value: money(yeniKira - m)
+  }), /*#__PURE__*/React.createElement(ResultRow, {
+    label: "Yeni Kira",
+    value: money(yeniKira),
+    big: true
+  }), /*#__PURE__*/React.createElement(ShareBar, {
+    title: "Kira Artış Hesabı",
+    lines: [{
+      label: "Mevcut Kira",
+      value: money(m)
+    }, {
+      label: "Artış Oranı",
+      value: `%${oran || 0}`
+    }, {
+      label: "Yeni Kira",
+      value: money(yeniKira)
+    }]
+  }));
+}
+function CalcEmsal() {
+  const [arsaAlani, setArsaAlani] = useState("");
+  const [emsal, setEmsal] = useState("");
+  const a = Number(arsaAlani) || 0;
+  const e = Number(emsal) || 0;
+  const insaatAlani = a * e;
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: 12,
+      color: "#64748b",
+      marginBottom: 14
+    }
+  }, "İnşaat Alanı = Arsa Alanı × Emsal (KAKS) oranı. İmar durumundaki güncel emsal değerini ilgili belediyeden teyit et."), /*#__PURE__*/React.createElement("label", {
+    className: "label"
+  }, "Arsa Alanı (m²)"), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    type: "number",
+    value: arsaAlani,
+    onChange: e => setArsaAlani(e.target.value),
+    style: {
+      marginBottom: 10
+    }
+  }), /*#__PURE__*/React.createElement("label", {
+    className: "label"
+  }, "Emsal (KAKS) Oranı"), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    type: "number",
+    step: "0.05",
+    value: emsal,
+    onChange: e => setEmsal(e.target.value),
+    style: {
+      marginBottom: 14
+    }
+  }), /*#__PURE__*/React.createElement(ResultRow, {
+    label: "Toplam İnşaat Alanı (emsal alan)",
+    value: `${insaatAlani.toLocaleString("tr-TR")} m²`,
+    big: true
+  }), /*#__PURE__*/React.createElement(ShareBar, {
+    title: "Arsa Emsal ve İnşaat Alanı Hesabı",
+    lines: [{
+      label: "Arsa Alanı",
+      value: `${a} m²`
+    }, {
+      label: "Emsal Oranı",
+      value: e
+    }, {
+      label: "İnşaat Alanı",
+      value: `${insaatAlani.toLocaleString("tr-TR")} m²`
+    }]
+  }));
+}
+function CalcInsaatMaliyet() {
+  const [alan, setAlan] = useState("");
+  const [birim, setBirim] = useState("");
+  const a = Number(alan) || 0;
+  const b = Number(birim) || 0;
+  const toplam = a * b;
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: 12,
+      color: "#64748b",
+      marginBottom: 14
+    }
+  }, "Toplam Maliyet = İnşaat Alanı × m² Birim Maliyet. Birim maliyeti Çevre, Şehircilik ve İklim Değişikliği Bakanlığı'nın güncel \"Bina İnşaat Metrekare Maliyetleri\" tebliğinden veya kendi güncel piyasa verinden gir."), /*#__PURE__*/React.createElement("label", {
+    className: "label"
+  }, "Toplam İnşaat Alanı (m²)"), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    type: "number",
+    value: alan,
+    onChange: e => setAlan(e.target.value),
+    style: {
+      marginBottom: 10
+    }
+  }), /*#__PURE__*/React.createElement("label", {
+    className: "label"
+  }, "m² Birim Maliyet (₺)"), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    type: "number",
+    value: birim,
+    onChange: e => setBirim(e.target.value),
+    style: {
+      marginBottom: 14
+    }
+  }), /*#__PURE__*/React.createElement(ResultRow, {
+    label: "Toplam İnşaat Maliyeti",
+    value: money(toplam),
+    big: true
+  }), /*#__PURE__*/React.createElement(ShareBar, {
+    title: "İnşaat m² Maliyet Hesabı",
+    lines: [{
+      label: "Alan",
+      value: `${a} m²`
+    }, {
+      label: "Birim Maliyet",
+      value: money(b)
+    }, {
+      label: "Toplam Maliyet",
+      value: money(toplam)
+    }]
+  }));
+}
+function CalcKentselDonusum() {
+  const [toplamBagimsiz, setToplamBagimsiz] = useState("");
+  const [payOrani, setPayOrani] = useState("");
+  const t = Number(toplamBagimsiz) || 0;
+  const o = Number(payOrani) / 100 || 0;
+  const arsaSahibiPay = t * o;
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: 12,
+      color: "#64748b",
+      marginBottom: 14
+    }
+  }, "Bu, kat karşılığı/kentsel dönüşüm anlaşmalarında sık kullanılan basit bir oranlama örneğidir; gerçek paylaşım sözleşme şartlarına, arsa payına ve bağımsız bölüm değerlerine göre değişir — bağlayıcı bir hesap değildir."), /*#__PURE__*/React.createElement("label", {
+    className: "label"
+  }, "Toplam Yeni Bağımsız Bölüm Sayısı"), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    type: "number",
+    value: toplamBagimsiz,
+    onChange: e => setToplamBagimsiz(e.target.value),
+    style: {
+      marginBottom: 10
+    }
+  }), /*#__PURE__*/React.createElement("label", {
+    className: "label"
+  }, "Arsa Sahibi Pay Oranı (%)"), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    type: "number",
+    value: payOrani,
+    onChange: e => setPayOrani(e.target.value),
+    style: {
+      marginBottom: 14
+    }
+  }), /*#__PURE__*/React.createElement(ResultRow, {
+    label: "Arsa Sahibine Düşen Bağımsız Bölüm (yaklaşık)",
+    value: arsaSahibiPay.toLocaleString("tr-TR", {
+      maximumFractionDigits: 1
+    }),
+    big: true
+  }), /*#__PURE__*/React.createElement(ShareBar, {
+    title: "Kentsel Dönüşüm Paylaşım Hesabı (yaklaşık)",
+    lines: [{
+      label: "Toplam Bağımsız Bölüm",
+      value: t
+    }, {
+      label: "Arsa Sahibi Payı",
+      value: `%${payOrani || 0}`
+    }, {
+      label: "Arsa Sahibine Düşen (yaklaşık)",
+      value: arsaSahibiPay.toLocaleString("tr-TR", {
+        maximumFractionDigits: 1
+      })
+    }]
+  }));
+}
+function CalcDegerleme() {
+  const [alan, setAlan] = useState("");
+  const [birimFiyat, setBirimFiyat] = useState("");
+  const a = Number(alan) || 0;
+  const b = Number(birimFiyat) || 0;
+  const tahminiDeger = a * b;
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: 12,
+      color: "#64748b",
+      marginBottom: 14
+    }
+  }, "Basit karşılaştırmalı değerleme: Tahmini Değer = Brüt Alan × Bölge Ortalama m² Satış Fiyatı. Bu resmi bir ekspertiz raporu değildir, sadece hızlı bir ön tahmindir."), /*#__PURE__*/React.createElement("label", {
+    className: "label"
+  }, "Brüt Alan (m²)"), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    type: "number",
+    value: alan,
+    onChange: e => setAlan(e.target.value),
+    style: {
+      marginBottom: 10
+    }
+  }), /*#__PURE__*/React.createElement("label", {
+    className: "label"
+  }, "Bölge Ortalama m² Satış Fiyatı (₺)"), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    type: "number",
+    value: birimFiyat,
+    onChange: e => setBirimFiyat(e.target.value),
+    style: {
+      marginBottom: 14
+    }
+  }), /*#__PURE__*/React.createElement(ResultRow, {
+    label: "Tahmini Değer",
+    value: money(tahminiDeger),
+    big: true
+  }), /*#__PURE__*/React.createElement(ShareBar, {
+    title: "Mülk Değerlendirme Raporu (ön tahmin)",
+    lines: [{
+      label: "Alan",
+      value: `${a} m²`
+    }, {
+      label: "m² Birim Fiyat",
+      value: money(b)
+    }, {
+      label: "Tahmini Değer",
+      value: money(tahminiDeger)
+    }]
+  }));
+}
+function CalcYatirim() {
+  const [alim, setAlim] = useState("");
+  const [guncel, setGuncel] = useState("");
+  const [ay, setAy] = useState("12");
+  const al = Number(alim) || 0;
+  const gu = Number(guncel) || 0;
+  const a = Number(ay) || 1;
+  const toplamGetiriPct = al > 0 ? (gu - al) / al * 100 : 0;
+  const yillikGetiriPct = al > 0 && a > 0 ? (Math.pow(gu / al, 12 / a) - 1) * 100 : 0;
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "label"
+  }, "Alım Fiyatı (₺)"), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    type: "number",
+    value: alim,
+    onChange: e => setAlim(e.target.value),
+    style: {
+      marginBottom: 10
+    }
+  }), /*#__PURE__*/React.createElement("label", {
+    className: "label"
+  }, "Güncel Değer (₺)"), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    type: "number",
+    value: guncel,
+    onChange: e => setGuncel(e.target.value),
+    style: {
+      marginBottom: 10
+    }
+  }), /*#__PURE__*/React.createElement("label", {
+    className: "label"
+  }, "Elde Tutulan Süre (ay)"), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    type: "number",
+    value: ay,
+    onChange: e => setAy(e.target.value),
+    style: {
+      marginBottom: 14
+    }
+  }), /*#__PURE__*/React.createElement(ResultRow, {
+    label: "Toplam Getiri",
+    value: `%${toplamGetiriPct.toFixed(1)}`,
+    big: true
+  }), /*#__PURE__*/React.createElement(ResultRow, {
+    label: "Yıllıklandırılmış Getiri (CAGR)",
+    value: `%${yillikGetiriPct.toFixed(1)}`
+  }), /*#__PURE__*/React.createElement(ShareBar, {
+    title: "Gayrimenkul Yatırım Performansı",
+    lines: [{
+      label: "Alım Fiyatı",
+      value: money(al)
+    }, {
+      label: "Güncel Değer",
+      value: money(gu)
+    }, {
+      label: "Süre",
+      value: `${a} ay`
+    }, {
+      label: "Toplam Getiri",
+      value: `%${toplamGetiriPct.toFixed(1)}`
+    }, {
+      label: "Yıllıklandırılmış Getiri",
+      value: `%${yillikGetiriPct.toFixed(1)}`
+    }]
+  }));
+}
+function CalcPortfoyMaliyet({
+  appData
+}) {
+  const list = appData.portfolio;
+  const toplamDeger = list.reduce((s, p) => s + (Number(p.price) || 0), 0);
+  const ortalama = list.length ? toplamDeger / list.length : 0;
+  const satilik = list.filter(p => p.type === "Satılık").length;
+  const kiralik = list.filter(p => p.type === "Kiralık").length;
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: 12,
+      color: "#64748b",
+      marginBottom: 14
+    }
+  }, "Portföy & Potansiyel bölümüne girdiğin gerçek verilerden otomatik hesaplanır."), /*#__PURE__*/React.createElement(ResultRow, {
+    label: "Toplam İlan Sayısı",
+    value: list.length
+  }), /*#__PURE__*/React.createElement(ResultRow, {
+    label: "Satılık / Kiralık",
+    value: `${satilik} / ${kiralik}`
+  }), /*#__PURE__*/React.createElement(ResultRow, {
+    label: "Toplam Portföy Değeri",
+    value: money(toplamDeger),
+    big: true
+  }), /*#__PURE__*/React.createElement(ResultRow, {
+    label: "Ortalama İlan Değeri",
+    value: money(ortalama)
+  }), /*#__PURE__*/React.createElement(ShareBar, {
+    title: "Portföy Maliyet Raporu",
+    lines: [{
+      label: "Toplam İlan",
+      value: list.length
+    }, {
+      label: "Satılık",
+      value: satilik
+    }, {
+      label: "Kiralık",
+      value: kiralik
+    }, {
+      label: "Toplam Değer",
+      value: money(toplamDeger)
+    }, {
+      label: "Ortalama Değer",
+      value: money(ortalama)
+    }]
+  }));
+}
+function CalcPortfoyPerformans({
+  appData
+}) {
+  const list = appData.portfolio;
+  const aktif = list.filter(p => p.status === "Aktif").length;
+  const beklemede = list.filter(p => p.status === "Beklemede").length;
+  const satildi = list.filter(p => p.status === "Satıldı").length;
+  const satisOrani = list.length ? satildi / list.length * 100 : 0;
+  const bugun = new Date();
+  const buAyEklenen = list.filter(p => {
+    if (!p.createdAt) return false;
+    const d = new Date(p.createdAt);
+    return d.getMonth() === bugun.getMonth() && d.getFullYear() === bugun.getFullYear();
+  }).length;
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: 12,
+      color: "#64748b",
+      marginBottom: 14
+    }
+  }, "Gerçek portföy verilerinden otomatik hesaplanır. \"Bu ay eklenen\", uygulamada bu tarihten sonra eklenen kayıtları sayar (eski kayıtlarda tarih bilgisi olmayabilir)."), /*#__PURE__*/React.createElement(ResultRow, {
+    label: "Aktif",
+    value: aktif
+  }), /*#__PURE__*/React.createElement(ResultRow, {
+    label: "Beklemede",
+    value: beklemede
+  }), /*#__PURE__*/React.createElement(ResultRow, {
+    label: "Satıldı",
+    value: satildi
+  }), /*#__PURE__*/React.createElement(ResultRow, {
+    label: "Satış Oranı",
+    value: `%${satisOrani.toFixed(1)}`,
+    big: true
+  }), /*#__PURE__*/React.createElement(ResultRow, {
+    label: "Bu Ay Eklenen İlan",
+    value: buAyEklenen
+  }), /*#__PURE__*/React.createElement(ShareBar, {
+    title: "Portföy Faaliyet & Performans Raporu",
+    lines: [{
+      label: "Aktif",
+      value: aktif
+    }, {
+      label: "Beklemede",
+      value: beklemede
+    }, {
+      label: "Satıldı",
+      value: satildi
+    }, {
+      label: "Satış Oranı",
+      value: `%${satisOrani.toFixed(1)}`
+    }, {
+      label: "Bu Ay Eklenen",
+      value: buAyEklenen
+    }]
+  }));
+}
+function CalcKomisyon() {
+  const [salePrice, setSalePrice] = useState("");
+  const [rate, setRate] = useState("2");
+  const commission = (Number(salePrice) || 0) * (Number(rate) / 100 || 0);
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "label"
+  }, "Satış Bedeli (₺)"), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    type: "number",
+    value: salePrice,
+    onChange: e => setSalePrice(e.target.value),
+    style: {
+      marginBottom: 10
+    }
+  }), /*#__PURE__*/React.createElement("label", {
+    className: "label"
+  }, "Komisyon Oranı (%)"), /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    type: "number",
+    value: rate,
+    onChange: e => setRate(e.target.value),
+    style: {
+      marginBottom: 14
+    }
+  }), /*#__PURE__*/React.createElement(ResultRow, {
+    label: "Komisyon Tutarı",
+    value: money(commission),
+    big: true
+  }), /*#__PURE__*/React.createElement(ShareBar, {
+    title: "Satış Komisyonu Hesabı",
+    lines: [{
+      label: "Satış Bedeli",
+      value: money(salePrice)
+    }, {
+      label: "Oran",
+      value: `%${rate}`
+    }, {
+      label: "Komisyon",
+      value: money(commission)
+    }]
+  }));
+}
+function CalcTools({
+  appData
+}) {
+  const [selected, setSelected] = useState("tapu");
+  const renderCalc = () => {
+    switch (selected) {
+      case "tapu":
+        return /*#__PURE__*/React.createElement(CalcTapu, null);
+      case "kiraci":
+        return /*#__PURE__*/React.createElement(CalcKiraci, null);
+      case "kredi":
+        return /*#__PURE__*/React.createElement(CalcKredi, null);
+      case "kiraartis":
+        return /*#__PURE__*/React.createElement(CalcKiraArtis, null);
+      case "emsal":
+        return /*#__PURE__*/React.createElement(CalcEmsal, null);
+      case "insaat":
+        return /*#__PURE__*/React.createElement(CalcInsaatMaliyet, null);
+      case "donusum":
+        return /*#__PURE__*/React.createElement(CalcKentselDonusum, null);
+      case "degerleme":
+        return /*#__PURE__*/React.createElement(CalcDegerleme, null);
+      case "yatirim":
+        return /*#__PURE__*/React.createElement(CalcYatirim, null);
+      case "portfoymaliyet":
+        return /*#__PURE__*/React.createElement(CalcPortfoyMaliyet, {
+          appData: appData
+        });
+      case "portfoyperf":
+        return /*#__PURE__*/React.createElement(CalcPortfoyPerformans, {
+          appData: appData
+        });
+      case "komisyon":
+        return /*#__PURE__*/React.createElement(CalcKomisyon, null);
+      default:
+        return null;
+    }
+  };
+  const activeLabel = CALC_LIST.find(c => c.id === selected)?.label || "";
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(SectionHeader, {
+    icon: "calc",
+    title: "Hesaplama Araçları",
+    accent: "gold"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "calc-layout"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "calc-list card",
+    style: {
+      padding: 8
+    }
+  }, CALC_LIST.map(c => /*#__PURE__*/React.createElement("button", {
+    key: c.id,
+    className: `nav-item ${selected === c.id ? "active" : ""}`,
+    style: {
+      width: "100%",
+      marginBottom: 2
+    },
+    onClick: () => setSelected(c.id)
+  }, c.label))), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      flex: 1,
+      minWidth: 0
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600,
+      marginBottom: 14
+    }
+  }, activeLabel), renderCalc())));
+}
+function AIAssistant({
+  appData
+}) {
+  const [apiKey, setApiKey] = useState("");
+  const [keySaved, setKeySaved] = useState(false);
+  const [keyInput, setKeyInput] = useState("");
+  const [messages, setMessages] = useState([{
+    role: "assistant",
+    content: "Merhaba! İlan metni yazabilir, günün özetini çıkarabilir, sosyal medya içeriği önerebilir veya piyasa verilerini yorumlayabilirim."
+  }]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const scrollRef = useRef(null);
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await AppStorage.get("groqApiKey", false);
+        if (res && res.value) {
+          setApiKey(res.value);
+          setKeySaved(true);
+        }
+      } catch (e) {}
+    })();
+  }, []);
+  useEffect(() => {
+    if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  }, [messages, loading]);
+  const saveKey = async () => {
+    if (!keyInput.trim()) return;
+    try {
+      await AppStorage.set("groqApiKey", keyInput.trim(), false);
+      setApiKey(keyInput.trim());
+      setKeySaved(true);
+      setKeyInput("");
+    } catch (e) {
+      setError("API anahtarı kaydedilemedi.");
+    }
+  };
+  const clearKey = async () => {
+    try {
+      await AppStorage.delete("groqApiKey", false);
+    } catch (e) {}
+    setApiKey("");
+    setKeySaved(false);
+  };
+  const contextSummary = () => {
+    const openTasks = appData.tasks.filter(t => !t.completed).length;
+    const unpaid = appData.expenses.filter(e => !e.paid);
+    const totalIncome = appData.income.reduce((s, i) => s + (Number(i.amount) || 0), 0);
+    const totalExpense = appData.expenses.reduce((s, e) => s + (Number(e.amount) || 0), 0);
+    return `Ofis: Murat İyicioğlu Gayrimenkul. Açık görev: ${openTasks}. Randevu: ${appData.appointments.length}. Bekleyen ödeme: ${unpaid.length}. Toplam gelir: ${totalIncome}₺, gider: ${totalExpense}₺. Aktif portföy: ${appData.portfolio.filter(p => p.status === "Aktif").length}. İlanlar: ${appData.portfolio.slice(0, 8).map(p => `${p.title} (${p.type}, ${p.price}₺, ${p.status})`).join("; ") || "yok"}.`;
+  };
+  const send = async () => {
+    if (!input.trim() || loading) return;
+    const userMsg = {
+      role: "user",
+      content: input.trim()
+    };
+    const nextMessages = [...messages, userMsg];
+    setMessages(nextMessages);
+    setInput("");
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: "openai/gpt-oss-120b",
+          messages: [{
+            role: "system",
+            content: `Sen Murat İyicioğlu Gayrimenkul için çalışan bir emlak ofisi asistanısın. Türkçe, kısa ve iş odaklı yanıt ver. Sadece elindeki verilere dayan; bilmediğin veya elinde olmayan bir bilgiyi ASLA uydurma — bunun yerine açıkça "bu bilgi elimde yok" de. Güncel ofis verileri: ${contextSummary()}`
+          }, ...nextMessages],
+          temperature: 0.4
+        })
+      });
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        throw new Error(errBody?.error?.message || `İstek başarısız (${res.status})`);
+      }
+      const data = await res.json();
+      const reply = data?.choices?.[0]?.message?.content?.trim() || "Yanıt alınamadı.";
+      setMessages(m => [...m, {
+        role: "assistant",
+        content: reply
+      }]);
+    } catch (e) {
+      setError(e.message || "Bağlantı hatası. API anahtarını kontrol et.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(SectionHeader, {
+    icon: "bot",
+    title: "AI Asistan",
+    accent: "teal"
+  }), !keySaved ? /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      marginBottom: 20
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row gap-2",
+    style: {
+      marginBottom: 8
+    }
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "key",
+    size: 15,
+    style: {
+      color: "#fcd34d"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600
+    }
+  }, "Groq API Anahtarı")), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: 12,
+      color: "#64748b",
+      marginBottom: 12
+    }
+  }, "console.groq.com üzerinden ücretsiz bir API anahtarı alabilirsin. Anahtar ", STORAGE_BACKEND === "cloud" ? "Claude bulut depolamanda" : "bu tarayıcının yerel deposunda (localStorage)", " saklanır — paylaşırsan anahtarın da görünür olabileceğini unutma."), /*#__PURE__*/React.createElement("div", {
+    className: "row gap-2"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "password",
+    className: "input",
+    placeholder: "gsk_...",
+    value: keyInput,
+    onChange: e => setKeyInput(e.target.value)
+  }), /*#__PURE__*/React.createElement("button", {
+    className: "btn",
+    onClick: saveKey
+  }, "Kaydet"))) : /*#__PURE__*/React.createElement("div", {
+    className: "chat-box"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row between",
+    style: {
+      padding: "10px 16px",
+      borderBottom: "1px solid var(--border)"
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "badge badge-ok"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "badge-dot"
+  }), "Groq bağlı"), /*#__PURE__*/React.createElement("button", {
+    onClick: clearKey,
+    style: {
+      background: "none",
+      border: "none",
+      color: "#64748b",
+      fontSize: 12,
+      cursor: "pointer"
+    }
+  }, "Anahtarı kaldır")), /*#__PURE__*/React.createElement("div", {
+    className: "disclaimer"
+  }, "⚠️ Yapay zeka yanıtları hata (halüsinasyon) içerebilir. Asistan yalnızca elindeki ofis verilerine dayanır; önemli kararlarda mutlaka doğrula."), /*#__PURE__*/React.createElement("div", {
+    className: "chat-msgs",
+    ref: scrollRef
+  }, messages.map((m, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    className: `msg ${m.role === "user" ? "user" : "bot"}`
+  }, m.content)), loading && /*#__PURE__*/React.createElement("div", {
+    className: "msg bot",
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 8
+    }
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "loader",
+    size: 13,
+    style: {
+      animation: "spin 1s linear infinite"
+    }
+  }), " yazıyor...")), error && /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "0 16px 8px",
+      fontSize: 11,
+      color: "#fb7185"
+    }
+  }, error), /*#__PURE__*/React.createElement("div", {
+    className: "row gap-2",
+    style: {
+      borderTop: "1px solid var(--border)",
+      padding: 12
+    }
+  }, /*#__PURE__*/React.createElement("input", {
+    className: "input",
+    placeholder: "Örn: Bu haftaki 3+1 ilanlar için Instagram metni yaz",
+    value: input,
+    onChange: e => setInput(e.target.value),
+    onKeyDown: e => e.key === "Enter" && send()
+  }), /*#__PURE__*/React.createElement("button", {
+    className: "btn",
+    style: {
+      padding: "9px 12px"
+    },
+    onClick: send,
+    disabled: loading
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "send",
+    size: 15
+  })))));
+}
+
+/* ---------------- Health check ---------------- */
+function HealthCheck({
+  appData
+}) {
+  const [results, setResults] = useState(null);
+  const [running, setRunning] = useState(false);
+  const runChecks = async () => {
+    setRunning(true);
+    const out = [];
+
+    // 1. Storage
+    try {
+      const testKey = "__health_check__";
+      await AppStorage.set(testKey, "ok", false);
+      const r = await AppStorage.get(testKey, false);
+      await AppStorage.delete(testKey, false);
+      out.push({
+        name: "Yerel Depolama",
+        ok: r && r.value === "ok",
+        detail: `Veri okuma/yazma çalışıyor (${STORAGE_BACKEND === "cloud" ? "Claude Bulut Depolama" : STORAGE_BACKEND === "local" ? "Tarayıcı LocalStorage (bağımsız kullanım)" : "yok"})`
+      });
+    } catch (e) {
+      out.push({
+        name: "Yerel Depolama",
+        ok: false,
+        detail: e.message || "Depolama erişilemedi"
+      });
+    }
+
+    // 2. Veri bütünlüğü
+    const arrayKeys = ["tasks", "appointments", "income", "expenses", "bankAssets", "portfolio", "siteData", "contacts", "documents"];
+    const brokenKeys = arrayKeys.filter(k => !Array.isArray(appData[k]));
+    out.push({
+      name: "Veri Bütünlüğü",
+      ok: brokenKeys.length === 0,
+      detail: brokenKeys.length === 0 ? "Tüm bölümler geçerli" : `Bozuk alan(lar): ${brokenKeys.join(", ")}`
+    });
+
+    // 3. Döviz API
+    try {
+      const r = await fetch("https://api.frankfurter.dev/v1/latest?from=USD&to=TRY");
+      out.push({
+        name: "Döviz Kuru Bağlantısı (Frankfurter)",
+        ok: r.ok,
+        detail: r.ok ? "Bağlantı başarılı" : `HTTP ${r.status}`
+      });
+    } catch (e) {
+      out.push({
+        name: "Döviz Kuru Bağlantısı (Frankfurter)",
+        ok: false,
+        detail: "Bağlanılamadı"
+      });
+    }
+
+    // 4. Altın API
+    try {
+      const r = await fetch("https://api.gold-api.com/price/XAU");
+      out.push({
+        name: "Altın Fiyatı Bağlantısı (Gold-API)",
+        ok: r.ok,
+        detail: r.ok ? "Bağlantı başarılı" : `HTTP ${r.status}`
+      });
+    } catch (e) {
+      out.push({
+        name: "Altın Fiyatı Bağlantısı (Gold-API)",
+        ok: false,
+        detail: "Bağlanılamadı"
+      });
+    }
+
+    // 5. Groq anahtarı
+    try {
+      const r = await AppStorage.get("groqApiKey", false);
+      if (r && r.value) out.push({
+        name: "AI Asistan (Groq) Anahtarı",
+        ok: true,
+        detail: "Anahtar kayıtlı"
+      });else out.push({
+        name: "AI Asistan (Groq) Anahtarı",
+        ok: null,
+        detail: "Anahtar girilmemiş — isteğe bağlı"
+      });
+    } catch (e) {
+      out.push({
+        name: "AI Asistan (Groq) Anahtarı",
+        ok: null,
+        detail: "Kontrol edilemedi"
+      });
+    }
+
+    // 6. Kur verisi tazeliği
+    const stale = !appData.rates.updatedAt || Date.now() - new Date(appData.rates.updatedAt).getTime() > 1000 * 60 * 60 * 6;
+    out.push({
+      name: "Kur Verisi Tazeliği",
+      ok: !stale,
+      detail: stale ? "6 saatten eski, panelden yenile" : "Güncel"
+    });
+    setResults(out);
+    setRunning(false);
+  };
+  useEffect(() => {
+    runChecks();
+  }, []);
+  const failCount = results ? results.filter(r => r.ok === false).length : 0;
+  const overallOk = results && failCount === 0;
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(SectionHeader, {
+    icon: "pulse",
+    title: "Sistem Sağlığı",
+    accent: "teal"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      marginBottom: 16
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row between"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      color: "#94a3b8",
+      marginBottom: 4
+    }
+  }, "Genel Durum"), results ? /*#__PURE__*/React.createElement("span", {
+    className: `badge ${overallOk ? "badge-ok" : "badge-warn"}`,
+    style: {
+      fontSize: 13,
+      padding: "5px 14px"
+    }
+  }, overallOk ? "%100 Sağlıklı" : `${failCount} sorun bulundu`) : /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 13,
+      color: "#64748b"
+    }
+  }, "Kontrol ediliyor...")), /*#__PURE__*/React.createElement("button", {
+    className: "btn-ghost",
+    style: {
+      display: "inline-flex",
+      alignItems: "center",
+      gap: 6,
+      fontSize: 12
+    },
+    onClick: runChecks,
+    disabled: running
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "refresh",
+    size: 13,
+    style: running ? {
+      animation: "spin 1s linear infinite"
+    } : {}
+  }), " Yeniden Kontrol Et"))), results && results.map(r => /*#__PURE__*/React.createElement("div", {
+    key: r.name,
+    className: "health-row"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "row gap-3"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "health-dot",
+    style: {
+      background: r.ok === true ? "#34d399" : r.ok === false ? "#fb7185" : "#64748b"
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 13,
+      color: "#e2e8f0"
+    }
+  }, r.name)), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 12,
+      color: "#94a3b8"
+    }
+  }, r.detail))));
+}
+
+/* ---------------- Error boundary ---------------- */
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      hasError: false,
+      msg: ""
+    };
+  }
+  static getDerivedStateFromError(err) {
+    return {
+      hasError: true,
+      msg: err?.message || "Bilinmeyen hata"
+    };
+  }
+  render() {
+    if (this.state.hasError) {
+      return /*#__PURE__*/React.createElement("div", {
+        style: {
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "column",
+          gap: 12,
+          padding: 20,
+          textAlign: "center"
+        }
+      }, /*#__PURE__*/React.createElement("div", {
+        style: {
+          width: 48,
+          height: 48,
+          borderRadius: 12,
+          background: "var(--rose-soft)",
+          border: "1px solid var(--rose-bd)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center"
+        }
+      }, /*#__PURE__*/React.createElement(Icon, {
+        name: "alert",
+        size: 22,
+        style: {
+          color: "#fda4af"
+        }
+      })), /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontSize: 15,
+          fontWeight: 600
+        }
+      }, "Beklenmedik bir hata oluştu"), /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontSize: 12,
+          color: "#64748b",
+          maxWidth: 340
+        }
+      }, this.state.msg, " — sayfayı yenilemeyi deneyebilirsin, verilerin tarayıcında güvenle saklı kalır."), /*#__PURE__*/React.createElement("button", {
+        className: "btn",
+        onClick: () => window.location.reload()
+      }, "Sayfayı Yenile"));
+    }
+    return this.props.children;
+  }
+}
+
+/* ---------------- App ---------------- */
+function App() {
+  const [page, setPage] = useState("dashboard");
+  const [appData, setAppData] = useState(EMPTY);
+  const [loaded, setLoaded] = useState(false);
+  const [splashFading, setSplashFading] = useState(false);
+  const [status, setStatus] = useState("");
+  const [navOpen, setNavOpen] = useState(false);
+  useEffect(() => {
+    const start = Date.now();
+    (async () => {
+      try {
+        const res = await AppStorage.get(STORAGE_KEY, false);
+        if (res && res.value) setAppData({
+          ...EMPTY,
+          ...JSON.parse(res.value)
+        });
+      } catch (e) {}
+      const elapsed = Date.now() - start;
+      const wait = Math.max(0, 550 - elapsed);
+      setTimeout(() => {
+        setLoaded(true);
+        setTimeout(() => setSplashFading(true), 50);
+      }, wait);
+    })();
+  }, []);
+  const persist = async next => {
+    setAppData(next);
+    try {
+      const res = await AppStorage.set(STORAGE_KEY, JSON.stringify(next), false);
+      setStatus(res ? "Kaydedildi" : "Kayıt hatası");
+    } catch (e) {
+      setStatus("Kayıt hatası");
+    }
+    setTimeout(() => setStatus(""), 1500);
+  };
+  const addRow = (sectionKey, row) => {
+    const newRow = {
+      ...row,
+      id: row.id || uid(),
+      createdAt: new Date().toISOString()
+    };
+    const newData = {
+      ...appData,
+      [sectionKey]: [newRow, ...appData[sectionKey]]
+    };
+
+    // Randevu sonrası otomatik takip görevleri oluştur (linkedAppointmentId ile mükerrer engelle)
+    if (sectionKey === "appointments" && newRow.title) {
+      const existingFollowUps = appData.tasks.filter(t => t.linkedAppointmentId === newRow.id).length;
+      if (existingFollowUps === 0) {
+        const followUp1 = new Date(new Date(newRow.createdAt).getTime() + 1 * 86400000);
+        const followUp2 = new Date(new Date(newRow.createdAt).getTime() + 7 * 86400000);
+        newData.tasks = [{
+          id: uid(),
+          task: `Takip: ${newRow.title}`,
+          dueDate: followUp1.toISOString().slice(0, 10),
+          priority: "Normal",
+          status: "Bekliyor",
+          createdAt: new Date().toISOString(),
+          linkedAppointmentId: newRow.id
+        }, {
+          id: uid(),
+          task: `2. Takip: ${newRow.title}`,
+          dueDate: followUp2.toISOString().slice(0, 10),
+          priority: "Normal",
+          status: "Bekliyor",
+          createdAt: new Date().toISOString(),
+          linkedAppointmentId: newRow.id
+        }, ...newData.tasks];
+      }
+    }
+    persist(newData);
+  };
+  const deleteRow = (sectionKey, id) => persist({
+    ...appData,
+    [sectionKey]: appData[sectionKey].filter(r => r.id !== id)
+  });
+  const toggleRow = (sectionKey, id) => {
+    const cfg = SECTIONS[sectionKey];
+    persist({
+      ...appData,
+      [sectionKey]: appData[sectionKey].map(r => r.id === id ? {
+        ...r,
+        [cfg.toggle.key]: !r[cfg.toggle.key]
+      } : r)
+    });
+  };
+  const renderPage = () => {
+    if (page === "dashboard") return /*#__PURE__*/React.createElement(Dashboard, {
+      appData: appData,
+      setPage: setPage,
+      persist: persist
+    });
+    if (page === "hotPortfolio") return /*#__PURE__*/React.createElement(HotPortfolioMatching, {
+      appData: appData
+    });
+    if (page === "commissionForecast") return /*#__PURE__*/React.createElement(CommissionForecast, {
+      appData: appData
+    });
+    if (page === "contentStudio") return /*#__PURE__*/React.createElement(ContentStudio, {
+      appData: appData,
+      persist: persist
+    });
+    if (page === "career") return /*#__PURE__*/React.createElement(CareerPlanning, {
+      appData: appData,
+      persist: persist
+    });
+    if (page === "marketSupply") return /*#__PURE__*/React.createElement(MarketSupplyAnalysis, {
+      appData: appData
+    });
+    if (page === "marketPortfolio") return /*#__PURE__*/React.createElement(PortfolioMarketAnalysis, {
+      appData: appData
+    });
+    if (page === "performance") return /*#__PURE__*/React.createElement(PerformanceReports, {
+      appData: appData
+    });
+    if (page === "search") return /*#__PURE__*/React.createElement(SmartSearch, {
+      appData: appData
+    });
+    if (page === "automation") return /*#__PURE__*/React.createElement(AutomationRules, {
+      appData: appData,
+      persist: persist
+    });
+    if (page === "gazette") return /*#__PURE__*/React.createElement(OfficialGazette, null);
+    if (page === "calc") return /*#__PURE__*/React.createElement(CalcTools, {
+      appData: appData
+    });
+    if (page === "ai") return /*#__PURE__*/React.createElement(AIAssistant, {
+      appData: appData
+    });
+    if (page === "health") return /*#__PURE__*/React.createElement(HealthCheck, {
+      appData: appData
+    });
+    if (SECTIONS[page]) {
+      return /*#__PURE__*/React.createElement(CrudSection, {
+        sectionKey: page,
+        data: appData[page],
+        onAdd: row => addRow(page, row),
+        onDelete: id => deleteRow(page, id),
+        onToggle: id => toggleRow(page, id)
+      });
+    }
+    return null;
+  };
+  return /*#__PURE__*/React.createElement(React.Fragment, null, !splashFading && /*#__PURE__*/React.createElement("div", {
+    className: `splash ${loaded ? "fade" : ""}`
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "splash-icon"
+  }, "Mİ"), /*#__PURE__*/React.createElement("div", {
+    className: "spinner"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "splash-name"
+  }, APP_NAME, " ", APP_SUB, " yükleniyor...")), loaded && /*#__PURE__*/React.createElement("div", {
+    className: "app"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "menu-btn btn-ghost",
+    style: {
+      position: "fixed",
+      top: 12,
+      left: 12,
+      zIndex: 60,
+      padding: 8,
+      borderRadius: 8
+    },
+    onClick: () => setNavOpen(v => !v)
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: "menu",
+    size: 18
+  })), /*#__PURE__*/React.createElement("aside", {
+    className: `sidebar ${navOpen ? "open" : ""}`
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "brand"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "brand-icon"
+  }, "Mİ"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "brand-name"
+  }, APP_NAME), /*#__PURE__*/React.createElement("div", {
+    className: "brand-sub"
+  }, APP_SUB, " Paneli"))), /*#__PURE__*/React.createElement("nav", {
+    className: "nav"
+  }, NAV_GROUPS.map(group => /*#__PURE__*/React.createElement("div", {
+    className: "nav-group",
+    key: group.title
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "nav-title"
+  }, group.title), group.items.map(item => /*#__PURE__*/React.createElement("button", {
+    key: item.key,
+    className: `nav-item ${page === item.key ? "active" : ""}`,
+    onClick: () => {
+      setPage(item.key);
+      setNavOpen(false);
+    }
+  }, /*#__PURE__*/React.createElement(Icon, {
+    name: item.icon,
+    size: 15
+  }), /*#__PURE__*/React.createElement("span", null, item.label)))))), /*#__PURE__*/React.createElement("div", {
+    className: "sidebar-footer"
+  }, /*#__PURE__*/React.createElement("span", null, todayISO()), status && /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "#34d399"
+    }
+  }, status))), /*#__PURE__*/React.createElement("main", {
+    className: "main"
+  }, renderPage())));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/*#__PURE__*/React.createElement(ErrorBoundary, null, /*#__PURE__*/React.createElement(App, null)));
+
+// ===== VOICE NOTE RECORDER =====
+const VoiceNoteRecorder = ({ appData, persist }) => {
+  const [isRecording, setIsRecording] = React.useState(false);
+  const [transcript, setTranscript] = React.useState('');
+  const [summary, setSummary] = React.useState('');
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [duration, setDuration] = React.useState(0);
+  const [selectedCustomer, setSelectedCustomer] = React.useState('');
+  const recognitionRef = React.useRef(null);
+  const timerRef = React.useRef(null);
+
+  React.useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+    const rec = new SpeechRecognition();
+    rec.lang = 'tr-TR';
+    rec.continuous = true;
+    rec.onstart = () => { setIsRecording(true); setTranscript(''); setDuration(0); timerRef.current = setInterval(() => setDuration(d => d >= 300 ? (rec.stop(), 300) : d + 1), 1000); };
+    rec.onresult = (e) => { for (let i = e.resultIndex; i < e.results.length; i++) { if (e.results[i].isFinal) setTranscript(prev => prev + e.results[i][0].transcript + ' '); } };
+    rec.onend = () => { setIsRecording(false); clearInterval(timerRef.current); };
+    rec.onerror = (e) => { alert('Mikrofon: ' + e.error); setIsRecording(false); clearInterval(timerRef.current); };
+    recognitionRef.current = rec;
+    return () => clearInterval(timerRef.current);
+  }, []);
+
+  const generateSummary = async () => {
+    if (!transcript.trim()) return;
+    setIsLoading(true);
+    try {
+      const stored = await window.storage?.get('groqApiKey');
+      if (!stored?.value) { alert('Groq API anahtarı gerekli'); setIsLoading(false); return; }
+      const prompt = `Görüşme transkriptini profesyonel özet yap:\n\n"${transcript}"\n\nÖzet:`;
+      const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${stored.value}` },
+        body: JSON.stringify({ model: 'openai/gpt-oss-120b', messages: [{ role: 'user', content: prompt }], max_tokens: 300 }),
+      });
+      const d = await resp.json();
+      if (d.choices?.[0]) setSummary(d.choices[0].message.content);
+      else alert('Hata: ' + (d.error?.message || 'API'));
+    } catch (e) { alert('Hata: ' + e.message); }
+    finally { setIsLoading(false); }
+  };
+
+  const save = () => {
+    if (!transcript.trim() || !selectedCustomer) { alert('Lütfen transkript ve müşteri seç'); return; }
+    const note = { id: uid(), date: new Date().toISOString(), appointmentId: appData.appointments?.[0]?.id || '', customerId: selectedCustomer, rawTranscript: transcript, summary: summary || 'N/A', duration, status: 'saved' };
+    const newData = { ...appData, voiceNotes: [note, ...(appData.voiceNotes || [])], tasks: [{ id: uid(), task: `Görüşme Takip: ${appData.contacts?.find(c => c.id === selectedCustomer)?.name || 'Müşteri'}`, dueDate: new Date(Date.now() + 2*86400000).toISOString().slice(0, 10), priority: 'Normal', status: 'Bekliyor', createdAt: new Date().toISOString(), linkedVoiceNoteId: note.id }, ...appData.tasks] };
+    persist(newData);
+    alert('✓ Kaydedildi');
+    setTranscript('');
+    setSummary('');
+    setSelectedCustomer('');
+  };
+
+  const t = Math.floor(duration / 60);
+  const s = duration % 60;
+  return React.createElement('div', { style: { padding: '14px', background: '#0A1120', borderRadius: 8, color: '#e2e8f0' } },
+    React.createElement('div', { style: { fontSize: 13, fontWeight: 600, marginBottom: 12 } }, isRecording ? '🔴 Kaydediliyor' : '🎤 Sesli Not'),
+    React.createElement('div', { style: { marginBottom: 14, padding: 12, background: '#16223A', borderRadius: 6, textAlign: 'center' } },
+      React.createElement('div', { style: { fontSize: 20, color: '#fcd34d', marginBottom: 8 } }, `⏱ ${t}:${s < 10 ? '0' : ''}${s}`),
+      React.createElement('button', { onClick: () => (isRecording ? recognitionRef.current?.stop() : recognitionRef.current?.start()), style: { padding: '8px 16px', background: isRecording ? '#dc2626' : '#059669', color: 'white', border: 'none', borderRadius: 4, cursor: 'pointer', fontWeight: 600 } }, isRecording ? '⏹ Durdur' : '▶ Başlat')
+    ),
+    transcript && React.createElement('div', { style: { marginBottom: 14, padding: 10, background: '#1e293b', borderRadius: 6, fontSize: 11 } },
+      React.createElement('label', { style: { fontWeight: 600, marginBottom: 6 } }, 'Transkript:'),
+      React.createElement('textarea', { value: transcript, onChange: (e) => setTranscript(e.target.value), style: { width: '100%', padding: 8, background: '#0f172a', border: '1px solid #334155', borderRadius: 4, color: '#e2e8f0', minHeight: 50, fontSize: 11 } })
+    ),
+    transcript && !summary && React.createElement('button', { onClick: generateSummary, disabled: isLoading, style: { width: '100%', padding: '8px', background: '#0f766e', color: 'white', border: 'none', borderRadius: 4, marginBottom: 14, fontWeight: 600 } }, isLoading ? '⟳ Özet...' : '✨ Özet Oluştur'),
+    summary && React.createElement('div', { style: { marginBottom: 14, padding: 10, background: '#1e293b', borderRadius: 6, fontSize: 11, color: '#cbd5e1' } }, React.createElement('b', { style: { color: '#34d399' } }, 'Özet: '), summary),
+    transcript && React.createElement('div', { style: { marginBottom: 14 } },
+      React.createElement('label', { style: { fontWeight: 600, fontSize: 11, marginBottom: 6 } }, 'Müşteri:'),
+      React.createElement('select', { value: selectedCustomer, onChange: (e) => setSelectedCustomer(e.target.value), style: { width: '100%', padding: '6px', background: '#0f172a', border: '1px solid #334155', borderRadius: 4, color: '#e2e8f0', fontSize: 11 } },
+        React.createElement('option', { value: '' }, '-- Seç --'),
+        (appData.contacts || []).map(c => React.createElement('option', { key: c.id, value: c.id }, c.name))
+      )
+    ),
+    transcript && React.createElement('button', { onClick: save, style: { width: '100%', padding: '8px', background: '#7c3aed', color: 'white', border: 'none', borderRadius: 4, fontWeight: 600 } }, '✓ Kaydet')
+  );
+};
+
+
+
+// ===== FLOATING VOICE NOTE UI =====
+const VoiceNoteFloatingButton = ({ appData, persist, onClose }) => {
+  const [showModal, setShowModal] = React.useState(false);
+  
+  return React.createElement(React.Fragment, null,
+    // Floating Button (sağ alt köşe, her sayfada)
+    React.createElement('button', { 
+      onClick: () => setShowModal(!showModal),
+      style: { 
+        position: 'fixed', 
+        bottom: '20px', 
+        right: '20px', 
+        width: '56px', 
+        height: '56px', 
+        borderRadius: '50%', 
+        background: '#7c3aed', 
+        color: 'white', 
+        border: 'none', 
+        cursor: 'pointer', 
+        fontSize: '24px', 
+        boxShadow: '0 4px 12px rgba(124, 58, 237, 0.4)', 
+        zIndex: 999 
+      } 
+    }, '🎤'),
+    
+    // Modal Background
+    showModal && React.createElement('div', { 
+      onClick: () => setShowModal(false),
+      style: { 
+        position: 'fixed', 
+        top: 0, 
+        left: 0, 
+        right: 0, 
+        bottom: 0, 
+        background: 'rgba(0,0,0,0.5)', 
+        zIndex: 1000, 
+        display: 'flex', 
+        alignItems: 'flex-end' 
+      } 
+    },
+      // Modal Content (aşağıdan kayar çıkar)
+      React.createElement('div', { 
+        onClick: (e) => e.stopPropagation(),
+        style: { 
+          width: '100%', 
+          maxWidth: '500px', 
+          maxHeight: '80vh', 
+          background: '#0A1120', 
+          borderRadius: '12px 12px 0 0', 
+          overflow: 'auto', 
+          animation: 'slideUp 0.3s ease' 
+        } 
+      },
+        React.createElement('div', { style: { padding: '16px', borderBottom: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center' } },
+          React.createElement('h3', { style: { margin: 0, color: '#e2e8f0', fontSize: 16 } }, '🎤 Sesli Görüşme Notu'),
+          React.createElement('button', { onClick: () => setShowModal(false), style: { background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: 20 } }, '✕')
+        ),
+        React.createElement('div', { style: { padding: '16px' } },
+          React.createElement(VoiceNoteRecorder, { appData: appData, persist: persist })
+        )
+      )
+    ),
+    
+    // CSS Animation
+    React.createElement('style', null, `
+      @keyframes slideUp {
+        from { transform: translateY(100%); }
+        to { transform: translateY(0); }
+      }
+    `)
+  );
+};
+
+
+
+// Voice Note Floating Component
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    try {
+      // Voice note container
+      const voiceContainer = document.createElement('div');
+      voiceContainer.id = 'voice-note-container';
+      document.body.appendChild(voiceContainer);
+      
+      // Global appData & persist referans (window.appState'ten almak gerek)
+      if (window.appState) {
+        const voiceRoot = ReactDOM.createRoot(voiceContainer);
+        voiceRoot.render(React.createElement(VoiceNoteFloatingButton, { 
+          appData: window.appState.appData, 
+          persist: window.appState.persist 
+        }));
+      }
+    } catch (e) {
+      console.warn('Voice Note UI load hatası:', e.message);
+    }
+  }, 500);
+});
+
+
+
+// ===== MARKET NEWS (TAVILY SEARCH) =====
+const MarketNews = ({ appData, persist }) => {
+  const [news, setNews] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
+  const [region, setRegion] = React.useState('Tekirdağ');
+
+  const searchMarket = async () => {
+    setLoading(true);
+    try {
+      const stored = await window.storage?.get('tavilyApiKey');
+      if (!stored?.value) {
+        alert('Tavily API anahtarı ayarla (Settings)');
+        setLoading(false);
+        return;
+      }
+      const query = `emlak piyasası "${region}" ${new Date().getFullYear()}`;
+      const resp = await fetch('https://api.tavily.com/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          api_key: stored.value,
+          query: query,
+          max_results: 15,
+          days: 7
+        })
+      });
+      const data = await resp.json();
+      const newsItems = (data.results || []).map((r, i) => ({
+        id: uid(),
+        date: new Date().toISOString().slice(0, 10),
+        title: r.title,
+        source: r.source || 'Bilinmiyor',
+        url: r.url,
+        summary: (r.snippet || r.title).slice(0, 200),
+        region: region,
+        relevance: i < 5 ? 'high' : i < 10 ? 'medium' : 'low'
+      }));
+      setNews(newsItems);
+      persist({ ...appData, marketNews: newsItems });
+    } catch (e) {
+      alert('Hata: ' + e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return React.createElement('div', null,
+    React.createElement('div', { style: { marginBottom: 16, padding: 14, background: '#0A1120', borderRadius: 8 } },
+      React.createElement('div', { style: { fontSize: 14, fontWeight: 600, color: '#e2e8f0', marginBottom: 12 } }, '🔍 Piyasa Haberleri'),
+      React.createElement('input', { type: 'text', value: region, onChange: (e) => setRegion(e.target.value), placeholder: 'Tekirdağ, İstanbul...', style: { width: '100%', padding: '8px', background: '#0f172a', border: '1px solid #334155', borderRadius: 4, color: '#e2e8f0', marginBottom: 10, fontSize: 11 } }),
+      React.createElement('button', { onClick: searchMarket, disabled: loading, style: { width: '100%', padding: '8px', background: '#0f766e', color: 'white', border: 'none', borderRadius: 4, fontWeight: 600, cursor: 'pointer' } }, loading ? '⟳ Aranıyor...' : '🔍 Haberleri Ara')
+    ),
+    news.map(article => React.createElement('div', { key: article.id, style: { marginBottom: 12, padding: 12, background: '#0A1120', borderRadius: 8, borderLeft: '3px solid #0f766e' } },
+      React.createElement('a', { href: article.url, target: '_blank', rel: 'noopener noreferrer', style: { fontSize: 12, fontWeight: 600, color: '#0f766e', textDecoration: 'none' } }, article.title),
+      React.createElement('div', { style: { fontSize: 9, color: '#64748b', marginTop: 4, marginBottom: 6 } }, article.source + ' • ' + article.date),
+      React.createElement('p', { style: { fontSize: 11, color: '#cbd5e1', margin: 0, lineHeight: 1.4 } }, article.summary + '...')
+    ))
+  );
+};
+
+
+
+// Update EMPTY with marketNews
+const EMPTY_WITH_TAVILY = {
+  tasks: [], appointments: [], income: [], expenses: [], bankAssets: [],
+  portfolio: [], siteData: [], contacts: [], documents: [], sectorEvents: [],
+  rates: { usd: 47.6, usdChange: 0.09, eur: 55.05, eurChange: 0.05, goldOns: 4268.17, goldOnsChange: 0.5, goldGram: 6532.31, goldGramChange: 0.5, ataAltin: 44097, ataAltinChange: 0.03, updatedAt: "" },
+  marketStats: { region: "Bölgem", forSaleCount: 0, forRentCount: 0, avgSalePrice: 0, avgOtherPrice: 0 },
+  socialPlan: { activeAccounts: 3, totalContent: 5, doneContent: 0 },
+  automationRules: { paymentReminderEnabled: true, paymentReminderDays: 3 },
+  careerGoals: { period30day: "", period60day: "", period90day: "", targetIncome: 0, targetClosures: 0 },
+  contentOutbox: [],
+  customerMatches: [],
+  voiceNotes: [],
+  marketNews: []
+};
+
+
+// Add marketNews to NAV_GROUPS
+const ADD_MARKET_NEWS = `
+  {
+    section: 'ANALİZ & ARAÇLAR',
+    pages: [
+      { id: 'marketSupply', name: 'Piyasa Arz Analizi', icon: 'bar-chart-2' },
+      { id: 'marketPortfolio', name: 'Portföy Pazarı', icon: 'pie-chart' },
+      { id: 'commissionForecast', name: 'Komisyon Tahmini', icon: 'trending-up' },
+      { id: 'marketNews', name: 'Piyasa Haberleri', icon: 'newspaper' },  // YENİ
+      { id: 'sectorEvents', name: 'Sektör Takvimi', icon: 'calendar' },
+      { id: 'gazette', name: 'Resmî Gazete', icon: 'scroll' },
+      { id: 'contentStudio', name: 'İçerik Stüdyosu', icon: 'edit-3' },
+      { id: 'ai', name: 'Emlak AI Tools', icon: 'cpu' },
+      { id: 'search', name: 'Akıllı Arama', icon: 'search' },
+      { id: 'automation', name: 'Otomasyon', icon: 'zap' },
+      { id: 'performance', name: 'Performans Raporları', icon: 'bar-chart' }
+    ]
+  }
+`;
+
+// Dashboard Widget: Pazarın Nabzı
+const PazarınNabzıWidget = ({ appData }) => {
+  const news = appData.marketNews || [];
+  return React.createElement('div', { style: { marginBottom: 14, padding: 12, background: '#0A1120', borderRadius: 8, borderLeft: '3px solid #0f766e' } },
+    React.createElement('div', { style: { fontSize: 12, fontWeight: 600, color: '#e2e8f0', marginBottom: 10 } }, '📰 Pazarın Nabzı (Son 7 Gün)'),
+    news.slice(0, 3).length > 0 ? 
+      news.slice(0, 3).map(n => React.createElement('div', { key: n.id, style: { fontSize: 10, marginBottom: 8, paddingBottom: 8, borderBottom: '1px solid #1e293b' } },
+        React.createElement('a', { href: n.url, target: '_blank', rel: 'noopener noreferrer', style: { color: '#0f766e', textDecoration: 'none' } }, n.title.slice(0, 50) + '...'),
+        React.createElement('div', { style: { fontSize: 9, color: '#64748b', marginTop: 2 } }, n.source)
+      ))
+    : React.createElement('div', { style: { fontSize: 10, color: '#64748b' } }, 'Henüz haber yok. Piyasa Haberleri sayfasında arama yap.'),
+    React.createElement('a', { href: '#/marketNews', style: { fontSize: 9, color: '#7c3aed', textDecoration: 'none', display: 'inline-block', marginTop: 8 } }, '→ Tüm haberleri gör')
+  );
+};
+
+
+
+// Tavily API Key Setting Component
+const TavilySettings = ({ appData, persist }) => {
+  const [tavilyKey, setTavilyKey] = React.useState('');
+
+  React.useEffect(() => {
+    (async () => {
+      const stored = await window.storage?.get('tavilyApiKey');
+      if (stored?.value) setTavilyKey('***HIDDEN***');
+    })();
+  }, []);
+
+  const saveTavilyKey = async () => {
+    if (!tavilyKey || tavilyKey === '***HIDDEN***') {
+      alert('Tavily API anahtarını gir');
+      return;
+    }
+    await window.storage?.set('tavilyApiKey', tavilyKey);
+    alert('✓ Tavily API anahtarı kaydedildi');
+    setTavilyKey('***HIDDEN***');
+  };
+
+  return React.createElement('div', { style: { marginTop: 16, padding: 12, background: '#0A1120', borderRadius: 8 } },
+    React.createElement('div', { style: { fontSize: 12, fontWeight: 600, color: '#e2e8f0', marginBottom: 10 } }, '🔍 Tavily (Piyasa Haberleri)'),
+    React.createElement('input', { type: 'password', placeholder: 'tvly-...', value: tavilyKey, onChange: (e) => setTavilyKey(e.target.value), style: { width: '100%', padding: '8px', background: '#0f172a', border: '1px solid #334155', borderRadius: 4, color: '#e2e8f0', marginBottom: 10, fontSize: 11 } }),
+    React.createElement('button', { onClick: saveTavilyKey, style: { width: '100%', padding: '8px', background: '#0f766e', color: 'white', border: 'none', borderRadius: 4, fontWeight: 600, cursor: 'pointer', marginBottom: 10 } }, '✓ Kaydet'),
+    React.createElement('div', { style: { fontSize: 9, color: '#64748b', lineHeight: 1.4 } }, 
+      'Tavily API anahtarını ',
+      React.createElement('a', { href: 'https://api.tavily.com', target: '_blank', style: { color: '#0f766e' } }, 'api.tavily.com'),
+      ' adresinden al (500 call/ay ücretsiz)'
+    )
+  );
+};
+
+
+
+// Enhanced AI System Prompt with Market Context
+const getAISystemPrompt = (appData) => {
+  const recentNews = appData.marketNews?.slice(0, 3).map(n => n.title).join(', ') || 'Haber yok';
+  const recentSales = appData.income?.filter(i => new Date(i.date) > new Date(Date.now() - 30*86400000)).length || 0;
+  const activeListings = appData.portfolio?.filter(p => p.status === 'Satılık')?.length || 0;
+  
+  return `
+Sen bir profesyonel emlak danışmanısın. Groq API'nin gücünü kullanarak:
+
+1. PAZAR BİLGİSİ
+   - Son haberler: ${recentNews}
+   - Güncel trendleri referans al, fiyat önerilerinde pazar durumunu belirt
+
+2. MÜŞTERİ TAVSİYELERİ
+   - Portföy analizi: ${activeListings} açık ilan
+   - Son satışlar: ${recentSales} işlem (30 gün)
+   - Müşteri ihtiyacını pazar durumu ile eşleştir
+
+3. KRİTİK KURALLAR
+   - Transkripsiyon hatası varsa müşteriye sor
+   - Fiyat tavsiyesi verirken pazar trendini açıkla
+   - Müşteri görüşme notlarını bağlama katarak yanıt ver
+
+Yanıtlar: Kısa, profesyonel, müşteri-odaklı. Emlak terimlerini Türkçe kullan.
+  `;
+};
+
+
+
+// Dashboard'a Tavily API Key Widget
+const TavilyDashboardWidget = ({ appData, persist }) => {
+  const [tavilyKey, setTavilyKey] = React.useState('');
+  const [saved, setSaved] = React.useState(false);
+
+  React.useEffect(() => {
+    (async () => {
+      const stored = await window.storage?.get('tavilyApiKey');
+      if (stored?.value) setTavilyKey('✓ Kaydedilmiş');
+    })();
+  }, []);
+
+  const saveTavilyKey = async () => {
+    if (!tavilyKey || tavilyKey.includes('Kaydedilmiş')) {
+      alert('Lütfen yeni bir Tavily API anahtarı gir');
+      return;
+    }
+    await window.storage?.set('tavilyApiKey', tavilyKey);
+    alert('✓ Tavily API anahtarı kaydedildi');
+    setTavilyKey('✓ Kaydedilmiş');
+    setSaved(true);
+    setTimeout(() => setSaved(false), 3000);
+  };
+
+  return React.createElement('div', { style: { marginBottom: 16, padding: 12, background: '#0A1120', borderRadius: 8, borderLeft: '3px solid #0f766e' } },
+    React.createElement('div', { style: { fontSize: 12, fontWeight: 600, color: '#e2e8f0', marginBottom: 10 } }, '🔍 Tavily API Ayarları'),
+    React.createElement('div', { style: { fontSize: 10, color: '#64748b', marginBottom: 10 } }, 'Piyasa Haberleri araması için gerekli'),
+    React.createElement('input', { 
+      type: 'password', 
+      placeholder: 'tvly-... (api.tavily.com\'dan al)', 
+      value: tavilyKey, 
+      onChange: (e) => setTavilyKey(e.target.value),
+      style: { 
+        width: '100%', 
+        padding: '8px', 
+        background: '#0f172a', 
+        border: '1px solid #334155', 
+        borderRadius: 4, 
+        color: '#e2e8f0', 
+        marginBottom: 10, 
+        fontSize: 11,
+        boxSizing: 'border-box'
+      } 
+    }),
+    React.createElement('button', { 
+      onClick: saveTavilyKey, 
+      style: { 
+        width: '100%', 
+        padding: '8px', 
+        background: saved ? '#059669' : '#0f766e', 
+        color: 'white', 
+        border: 'none', 
+        borderRadius: 4, 
+        fontWeight: 600, 
+        cursor: 'pointer',
+        fontSize: 11
+      } 
+    }, saved ? '✓ Kaydedildi' : '🔒 Kaydet'),
+    React.createElement('div', { style: { fontSize: 9, color: '#64748b', marginTop: 8, lineHeight: 1.4 } },
+      '1. ',
+      React.createElement('a', { href: 'https://api.tavily.com', target: '_blank', style: { color: '#0f766e' } }, 'api.tavily.com'),
+      ' adresine git\n2. Ücretsiz API key al (500 call/ay)\n3. Anahtarı buraya yapıştır'
+    )
+  );
+};
+
+</script>
+</body>
+</html>
